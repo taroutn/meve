@@ -8,25 +8,32 @@
 ---
 
 ## 📝 Descripción del Proyecto
-**MeVe** es una plataforma de comercio electrónico O2O (Online-to-Offline) diseñada para digitalizar y ordenar el micro-comercio urbano. El sistema reemplaza el caos de las consultas por estados de WhatsApp mediante un catálogo centralizado y geolocalizado. Conecta a los vecinos con los emprendedores de su zona, ofreciendo una experiencia de compra fluida que culmina en la coordinación de un retiro físico y seguro, cerrando la brecha digital de los pequeños productores.
+**MeVe** introduce un ecosistema O2O Commerce (Online-to-Offline) que inyecta ingeniería de software para resolver las ineficiencias críticas del comercio informal y de proximidad. El sistema erradica la fricción transaccional y la desorganización operativa de las consultas manuales repetitivas ("¿sigue disponible?", "¿qué precio tiene?") mediante un catálogo unificado y un control de inventario en tiempo real. Conecta a los vecinos con los micro-comerciantes de su zona, ofreciendo una experiencia de compra fluida que culmina en la coordinación automatizada de un retiro físico.
 
 ## 🚀 Alcance y Funcionalidades Principales (MVP)
 
-* **Motor de Proximidad:** Filtrado automático de productos basado en la distancia geográfica entre el comprador y el vendedor para fomentar el comercio de cercanía.
-* **Gestor Inteligente de Retiros (Click & Collect):** Sistema de turnos con cupos limitados por hora. El comprador selecciona una franja horaria disponible, evitando superposiciones y ordenando la logística del vendedor.
-* **Checkout Protegido:** Integración con MercadoPago (entorno Sandbox) para garantizar la transacción y bloquear el stock temporalmente hasta la confirmación del pago mediante Webhooks.
-* **Accesibilidad Extrema:** Frontend diseñado con controles nativos para modo oscuro, ajuste de tamaño de fuente (zoom) y paletas adaptadas para daltonismo.
-* **Gestión de Roles:** Aislamiento de datos Multi-tenant con roles definidos (SuperAdmin, Vendedor, Comprador Logueado, Visitante).
-* **Interacción Directa:** Módulo de Preguntas y Respuestas (Q&A) en cada producto y sistema de calificación de vendedores.
+* **Arquitectura Multitenant:** Cada micro-comercio opera como una unidad independiente (tenant) con gestión aislada de su catálogo e inventario, mientras que la vitrina pública consolida la oferta de todos los comercios activos.
+* **Motor de Proximidad:** Los resultados de búsqueda se ordenan en función de la distancia entre la ubicación del comprador y la del comercio, resuelta mediante consulta geoespacial sobre un índice dedicado.
+* **Gestor Inteligente de Retiros (Click & Collect):** El sistema presenta al comprador únicamente las franjas horarias que conservan cupo, bloqueando automáticamente los turnos excedentes.
+* **Checkout Protegido y Bloqueo Preventivo:** La reserva de una franja compromete temporalmente el stock (estado `PENDIENTE_PAGO`). Se deriva al comprador al entorno Sandbox de MercadoPago; si se aprueba el cobro, se consolida la orden (`PAGADO_CONFIRMADO`) y se emite el ticket.
+* **Rollback Automatizado:** Una tarea programada libera automáticamente el cupo y el stock si el pago no se confirma en una ventana de quince minutos.
+* **Accesibilidad Extrema:** Interfaz inclusiva con controles nativos para modo oscuro, ajuste de tamaño tipográfico (hasta 200%) y paletas de alto contraste adaptadas para daltonismo.
+* **Gestión de Roles Asimétrica:** Perfiles definidos para SuperAdmin, Vendedor (con autenticación y token de sesión) y Guest (operación sin registro para el comprador).
+* **Cierre de Operación vía WhatsApp:** Envío del comprobante de retiro mediante enlace estructurado, conectando al comprador con el vendedor exclusivamente para la coordinación final.
 
-*(Nota: Los módulos de envíos integrados con tracking de logística y pasarelas de pago reales se encuentran fuera del alcance del MVP para garantizar la viabilidad temporal del desarrollo).*
+### ❌ Fuera del Alcance (Out of Scope)
+Para garantizar la viabilidad temporal del Trabajo Final, quedan excluidos los siguientes módulos:
+* Operación con fondos reales, devoluciones y resolución de disputas.
+* Logística, distribución a domicilio y seguimiento de envíos.
+* Plataforma de mensajería interna e integración con la API oficial de WhatsApp Business.
+* Facturación electrónica e integración con organismos fiscales.
+* Aplicación móvil nativa.
 
 ## 🛠️ Stack Tecnológico
 
-* **Frontend:** TypeScript, HTML5, CSS3 (Enfoque en maquetado accesible y control del DOM sin frameworks pesados).
-* **Backend:** Spring Boot (Java), Spring Security, JWT (Arquitectura MVC, API REST stateless).
-* **Base de Datos:** MongoDB Atlas (Modelo NoSQL para esquemas documentales flexibles).
-* **Despliegue:** Plataformas Cloud (PaaS) a definir (ej. Render, Vercel).
+* **Frontend:** React y TypeScript para la construcción de interfaces dinámicas (SPA) con tipado estático.
+* **Backend:** Spring Boot (Java), Spring Security, JWT (Arquitectura MVC, autenticación stateless).
+* **Base de Datos:** MongoDB Atlas (Modelo NoSQL para catálogos heterogéneos y documentos flexibles).
 
 ## 👥 Equipo de Desarrollo
 
