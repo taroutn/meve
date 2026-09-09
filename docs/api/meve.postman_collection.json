@@ -1,0 +1,122 @@
+{
+  "info": {
+    "_postman_id": "583ca18c-15d9-456b-bcf0-7f72158331ea",
+    "name": "MeVe MVP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55203970",
+    "_collection_link": "https://go.postman.co/collection/55203970-583ca18c-15d9-456b-bcf0-7f72158331ea?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Comercios",
+      "item": [
+        {
+          "name": "Registrar comercio",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"slug\": \"almacen-dona-rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ]
+            },
+            "description": "Registra un nuevo comercio (tenant) en la plataforma.\n\n_**CAMPOS**_\n\nnombre obligatorio. Nombre comercial visible al publico.\n\nslug obligatorio, unico. Identificador del tenant. Va en la URL  \npublica del comercio. NO se puede modificar despues de creado.\n\nrubro obligatorio. Valores: ALMACEN, VERDULERIA, PANADERIA,  \nCARNICERIA, KIOSCO, FARMACIA, OTRO.\n\ndescripcion opcional. Maximo 300 caracteres.\n\nwhatsapp obligatorio. Formato E.164 sin espacios ni guiones.\n\nDe este numero se arma el link wa.me para cerrar el pedido.\n\ndireccion obligatorio. Objeto con calle, barrio, ciudad, provincia.\n\nubicacion opcional. lat y lng. Se usa para el motor de proximidad.\n\nhorarios opcional. Lista de tramos. Admite mas de un tramo por dia  \npara contemplar el cierre del mediodia.\n\nRESPUESTAS\n\n201 Comercio creado. Ver example \"201 - Comercio creado\".  \n400 Error de validacion. Ver example \"400 - Datos invalidos\".  \n409 Ya existe un comercio con ese slug.\n\nNOTAS\n\nEl comercio se crea con estado PENDIENTE y activo en false. No aparece en  \nla vitrina publica hasta que un SuperAdmin lo aprueba.\n\nPENDIENTE DE DEFINIR CON BACKEND:\n\nSi el slug lo manda el cliente o lo genera el backend desde el nombre.\n\nSi este endpoint crea tambien el usuario Vendedor o es un paso aparte.\n\nSi requiere autenticacion de SuperAdmin o es un alta publica."
+          },
+          "response": [
+            {
+              "name": "201 - Comercio creado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"slug\": \"almacen-dona-rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/comercios",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "comercios"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"id\": \"665f1c2a9b3e4a0012ab34cd\",\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"slug\": \"almacen-dona-rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"estado\": \"PENDIENTE\",\r\n  \"activo\": false,\r\n  \"createdAt\": \"2026-09-08T20:15:30Z\"\r\n}"
+            },
+            {
+              "name": "400 - Datos invalidos",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"slug\": \"almacen-dona-rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/comercios",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "comercios"
+                  ]
+                }
+              },
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [],
+              "body": "{\r\n  \"timestamp\": \"2026-09-08T20:15:30Z\",\r\n  \"status\": 400,\r\n  \"error\": \"Bad Request\",\r\n  \"message\": \"Error de validacion\",\r\n  \"path\": \"/api/comercios\",\r\n  \"errors\": [\r\n    { \"campo\": \"whatsapp\", \"detalle\": \"El formato debe ser E.164, ej: +5493884123456\" },\r\n    { \"campo\": \"slug\", \"detalle\": \"Ya existe un comercio con ese slug\" }\r\n  ]\r\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
