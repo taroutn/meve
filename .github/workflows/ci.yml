@@ -1,0 +1,78 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend:
+    name: backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v7
+
+      - name: Verificar si existe el backend
+        id: check
+        run: |
+          if [ -f backend/pom.xml ]; then
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Todavia no existe backend/pom.xml. Job omitido."
+          fi
+
+      - name: Configurar Java
+        if: steps.check.outputs.existe == 'true'
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compilar y ejecutar pruebas
+        if: steps.check.outputs.existe == 'true'
+        working-directory: backend
+        run: mvn -B verify
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codigo
+        uses: actions/checkout@v7
+
+      - name: Verificar si existe el frontend
+        id: check
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "existe=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "existe=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Todavia no existe frontend/package.json. Job omitido."
+          fi
+
+      - name: Configurar Node
+        if: steps.check.outputs.existe == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependencias
+        if: steps.check.outputs.existe == 'true'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        if: steps.check.outputs.existe == 'true'
+        working-directory: frontend
+        run: npm run test --if-present
+
+      - name: Compilar
+        if: steps.check.outputs.existe == 'true'
+        working-directory: frontend
+        run: npm run build --if-present
