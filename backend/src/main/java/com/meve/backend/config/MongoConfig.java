@@ -12,15 +12,19 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return "meve"; // Forzamos el nombre de tu base de datos
+        return "meve+"; 
     }
 
     @Override
     public MongoClient mongoClient() {
-        // Forzamos la URI directamente en el driver de MongoDB
-        ConnectionString connectionString = new ConnectionString(
-            "mongodb+srv://lautarocejas_db_user:VsTF9MODSgTODjdP@cluster0.opjgl8i.mongodb.net/meve?retryWrites=true&w=majority"
-        );
+        // Leemos la variable directamente del sistema operativo, esquivando application.properties
+        String mongoUri = System.getenv("MONGO_URI");
+        
+        if (mongoUri == null || mongoUri.isEmpty()) {
+            throw new RuntimeException("ERROR CRÍTICO: La variable de entorno MONGO_URI no está definida en tu sistema.");
+        }
+
+        ConnectionString connectionString = new ConnectionString(mongoUri);
         
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
             .applyConnectionString(connectionString)
