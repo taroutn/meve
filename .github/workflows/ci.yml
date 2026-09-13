@@ -36,6 +36,8 @@ jobs:
         if: steps.check.outputs.existe == 'true'
         working-directory: backend
         run: mvn -B verify
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
 
   frontend:
     name: frontend
