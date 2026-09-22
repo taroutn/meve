@@ -1,0 +1,46 @@
+:root {
+  /* Paleta de colores oficial */
+  --color-verde-salvia: #8a9a86;
+  --color-celeste: #a2c4c9;
+  --color-beige: #f4f1ea;
+  --color-negro: #1a1a1a;
+  
+  /* Colores de soporte / Semánticos */
+  --color-bg-main: var(--color-beige);
+  --color-text-main: var(--color-negro);
+  --color-navbar-bg: #ffffff;
+  --color-primary: var(--color-verde-salvia);
+  --color-accent: var(--color-celeste);
+
+  /* Espaciados base en rem */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.5rem;   /* 24px */
+  --spacing-xl: 2rem;     /* 32px */
+}
+
+/* Configuración de accesibilidad y zoom */
+html {
+  font-size: 100%; /* 1rem = 16px por defecto, respeta el zoom del usuario */
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem; /* 16px base */
+  line-height: 1.5;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+}
+
+h1 { font-size: 2rem; }     /* 32px */
+h2 { font-size: 1.5rem; }   /* 24px */
+p  { font-size: 1rem; }     /* 16px */
+small { font-size: 0.875rem; } /* 14px */
