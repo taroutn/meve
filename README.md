@@ -43,14 +43,47 @@ Para garantizar la viabilidad temporal del Trabajo Final, quedan excluidos los s
 
 ---
 
-## ⚙️ Configuración del Entorno de Desarrollo
+## ⚙️ Configuración del Entorno de Desarrollo Local
 
 ### Prerrequisitos
 * Java 17 o superior.
 * Node.js v18+.
 * Cuenta en MongoDB Atlas (URI de conexión).
+* Git.
 
-### Levantando el Backend (Spring Boot)
-1. Clonar el repositorio: 
+### Instalación y Ejecución
+
+1. **Clonar el repositorio:** 
    ```bash
-   git clone [https://github.com/taroutn/meve.git](https://github.com/taroutn/meve.git)
+   git clone https://github.com/taroutn/meve.git
+   cd meve
+   ```
+
+2. **Levantar el Backend (Spring Boot) y BD:**
+   ```bash
+   cd backend
+   ```
+   * Configurar la variable de entorno `MONGO_URI` localmente o mediante el archivo `.env` en la raíz del backend.
+   * Levantar la aplicación con el wrapper de Maven:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   * **Nota sobre variables de entorno:** El comando de Maven no lee el archivo `.env` de forma nativa. Si ejecutás por consola, pasá la variable directamente:
+     ```bash
+     MONGO_URI="tu_uri_aqui" ./mvnw spring-boot:run
+     ```
+   * **Alternativa para IDEs:** Si usás VS Code, levantá el proyecto desde la pestaña "Run and Debug" (esto lee el `launch.json` que inyecta el `.env`). Si usás IntelliJ IDEA, agregá la URI en el campo "Environment Variables" de tu Run Configuration.
+   * **Prueba de Aislamiento de Datos (Multitenant):** 
+     1. Realizar un `POST` a `/api/comercios` para registrar un tenant y copiar su `id`.
+     2. Enviar peticiones a `/api/productos` enviando el header `X-Tenant-ID: <id_del_comercio>` para validar el aislamiento automático de datos.
+
+3. **Levantar el Frontend (React + TypeScript):**
+   ```bash
+   cd ../frontend
+   npm install
+   npm run dev
+   ```
+   * Ingresar a `http://localhost:5173/`.
+   * **Pruebas de UI Shell y Enrutamiento:** Verificar que el Navbar superior se mantenga fijo al navegar entre "Inicio" y "Comercios", y que los colores correspondan a la paleta oficial (verde salvia, celeste, beige).
+   * **Prueba de Accesibilidad:** Aplicar zoom en el navegador para verificar la adaptabilidad del texto (uso de unidades relativas `rem`).
+   * Revisar la consola para constatar la ausencia de advertencias de tipado. Opcionalmente, correr `npm run lint`.
