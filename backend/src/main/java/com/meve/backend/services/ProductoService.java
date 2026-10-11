@@ -25,6 +25,6 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
     public List<Producto> listarCatalogoPublico() {
-        return productoRepository.findAll();
+        return productoRepository.findByActivoNot(false);
     }
 }

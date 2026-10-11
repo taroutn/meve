@@ -9,4 +9,5 @@ import java.util.List;
 public interface ProductoRepository extends MongoRepository<Producto, String> {
     // Spring Data MongoDB autogenera la query para esto:
     List<Producto> findByComercioId(String comercioId);
+    List<Producto> findByActivoNot(Boolean activo);
 }
