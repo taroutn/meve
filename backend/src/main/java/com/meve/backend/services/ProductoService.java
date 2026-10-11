@@ -6,6 +6,8 @@ import com.meve.backend.repositories.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductoService {
 
@@ -21,5 +23,8 @@ public class ProductoService {
         producto.setActivo(true);
         
         return productoRepository.save(producto);
+    }
+    public List<Producto> listarCatalogoPublico() {
+        return productoRepository.findAll();
     }
 }
