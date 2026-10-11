@@ -1,0 +1,34 @@
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home-header {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.home-header h1 {
+  color: var(--color-negro);
+  margin-bottom: 0.5rem;
+}
+
+.home-header p {
+  color: #555555;
+  font-size: 1.125rem;
+}
+
+/* Sistema de grilla adaptativa para mobile y desktop */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
+}
+
+/* Ajustes responsivos para pantallas pequeñas */
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
