@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoController {
@@ -20,5 +22,10 @@ public class ProductoController {
     public ResponseEntity<Producto> crearProducto(@Valid @RequestBody ProductoRequest request) {
         Producto nuevoProducto = productoService.crearProducto(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Producto>> listarCatalogo() {
+        return ResponseEntity.ok(productoService.listarCatalogoPublico());
     }
 }
