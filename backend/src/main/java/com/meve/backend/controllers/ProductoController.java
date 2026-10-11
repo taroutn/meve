@@ -1,5 +1,6 @@
 package com.meve.backend.controllers;
 
+import com.meve.backend.dtos.ProductoCatalogoDTO;
 import com.meve.backend.dtos.ProductoRequest;
 import com.meve.backend.models.Producto;
 import com.meve.backend.services.ProductoService;
@@ -25,7 +26,7 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Producto>> listarCatalogo() {
+    public ResponseEntity<List<ProductoCatalogoDTO>> listarCatalogo() {
         return ResponseEntity.ok(productoService.listarCatalogoPublico());
     }
 }
