@@ -7,9 +7,10 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
-    // Llamada HTTP al endpoint que retorna List<ProductoCatalogoDTO>
+    // Llamada HTTP al endpoint del backend
     fetch('http://localhost:8080/api/productos')
       .then((response) => {
         if (!response.ok) {
@@ -27,39 +28,54 @@ export default function Home() {
       });
   }, []);
 
+  // Lógica de filtrado en el cliente (case-insensitive evaluando el nombre del producto)
+  const filteredProducts = products.filter((product) =>
+    product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="home-container">
       <div className="home-header">
         <h1>Exploración Hiperlocal</h1>
         <p>Descubrí los mejores productos de los comercios cercanos en un solo lugar.</p>
+
+        {/* Input de texto (barra de búsqueda) */}
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Buscar productos por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
       </div>
 
-      {/* Estado 1: Cargando */}
+      {/* Estado de Carga */}
       {loading && (
         <div className="status-message">
           <p>Cargando productos del catálogo...</p>
         </div>
       )}
 
-      {/* Estado 2: Error */}
+      {/* Estado de Error */}
       {error && (
         <div className="status-message error">
           <p>{error}</p>
-          <small>Asegurate de tener corriendo el servidor backend Spring Boot en localhost:8080.</small>
         </div>
       )}
 
-      {/* Estado 3: Sin Productos */}
-      {!loading && !error && products.length === 0 && (
+      {/* Estado de Búsqueda sin Resultados */}
+      {!loading && !error && filteredProducts.length === 0 && (
         <div className="status-message">
-          <p>No hay productos activos en el catálogo actualmente.</p>
+          <p>No se encontraron productos que coincidan con "{searchTerm}".</p>
         </div>
       )}
 
-      {/* Estado 4: Éxito con datos de la API */}
-      {!loading && !error && products.length > 0 && (
+      {/* Grilla de Resultados Dinámica */}
+      {!loading && !error && filteredProducts.length > 0 && (
         <div className="product-grid">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
