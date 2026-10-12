@@ -1,53 +1,32 @@
+import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import type { Product } from '../types/product';
 import './Home.css';
 
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Café Orgánico de Especialidad 250g',
-    price: 4500,
-    imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=500',
-    storeName: 'Café Central Bar',
-  },
-  {
-    id: '2',
-    name: 'Pan Savorizado de Masa Madre',
-    price: 2200,
-    imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=500',
-    storeName: 'Panadería Don José',
-  },
-  {
-    id: '3',
-    name: 'Alfajores Artesanales de Nuez (x6)',
-    price: 3800,
-    imageUrl: 'https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80&w=500',
-    storeName: 'Dulzuras Pinamar',
-  },
-  {
-    id: '4',
-    name: 'Cerveza Artesanal IPA 500ml',
-    price: 2900,
-    imageUrl: 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&q=80&w=500',
-    storeName: 'Cervecería Ogham',
-  },
-  {
-    id: '5',
-    name: 'Empanadas de Carne Cortada a Cuchillo (Docena)',
-    price: 9500,
-    imageUrl: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&q=80&w=500',
-    storeName: 'La vieja esquina',
-  },
-  {
-    id: '6',
-    name: 'Combo Picada Regional para 2',
-    price: 14000,
-    imageUrl: 'https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&q=80&w=500',
-    storeName: 'Almacén de Campo',
-  },
-];
-
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Llamada HTTP al endpoint que retorna List<ProductoCatalogoDTO>
+    fetch('http://localhost:8080/api/productos')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('No se pudo obtener el catálogo de productos del servidor.');
+        }
+        return response.json();
+      })
+      .then((data: Product[]) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message || 'Error de conexión con la API.');
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <div className="home-container">
       <div className="home-header">
@@ -55,12 +34,36 @@ export default function Home() {
         <p>Descubrí los mejores productos de los comercios cercanos en un solo lugar.</p>
       </div>
 
-      {/* Grilla responsiva de productos */}
-      <div className="product-grid">
-        {mockProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Estado 1: Cargando */}
+      {loading && (
+        <div className="status-message">
+          <p>Cargando productos del catálogo...</p>
+        </div>
+      )}
+
+      {/* Estado 2: Error */}
+      {error && (
+        <div className="status-message error">
+          <p>{error}</p>
+          <small>Asegurate de tener corriendo el servidor backend Spring Boot en localhost:8080.</small>
+        </div>
+      )}
+
+      {/* Estado 3: Sin Productos */}
+      {!loading && !error && products.length === 0 && (
+        <div className="status-message">
+          <p>No hay productos activos en el catálogo actualmente.</p>
+        </div>
+      )}
+
+      {/* Estado 4: Éxito con datos de la API */}
+      {!loading && !error && products.length > 0 && (
+        <div className="product-grid">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
