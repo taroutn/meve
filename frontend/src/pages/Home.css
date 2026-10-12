@@ -18,7 +18,40 @@
   font-size: 1.125rem;
 }
 
-/* Sistema de grilla adaptativa para mobile y desktop */
+/* Estilos de la barra de búsqueda */
+.search-container {
+  margin-top: 1.5rem;
+  width: 100%;
+  max-width: 450px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-input:focus {
+  border-color: var(--color-verde-salvia, #5a7d65);
+  box-shadow: 0 0 0 3px rgba(90, 125, 101, 0.15);
+}
+
+.status-message {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.125rem;
+  color: var(--color-verde-salvia);
+}
+
+.status-message.error {
+  color: #d9534f;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
@@ -26,7 +59,6 @@
   justify-items: center;
 }
 
-/* Ajustes responsivos para pantallas pequeñas */
 @media (max-width: 480px) {
   .product-grid {
     grid-template-columns: 1fr;
