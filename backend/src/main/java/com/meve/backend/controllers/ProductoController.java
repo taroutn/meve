@@ -1,7 +1,10 @@
 package com.meve.backend.controllers;
 
+import com.meve.backend.dtos.ProductoCatalogoDTO;
+import com.meve.backend.dtos.ProductoRequest;
 import com.meve.backend.models.Producto;
 import com.meve.backend.services.ProductoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +20,13 @@ public class ProductoController {
     private ProductoService productoService;
 
     @PostMapping
-    public ResponseEntity<Producto> crear(@RequestBody Producto producto) {
-        return new ResponseEntity<>(productoService.crearProducto(producto), HttpStatus.CREATED);
+    public ResponseEntity<Producto> crearProducto(@Valid @RequestBody ProductoRequest request) {
+        Producto nuevoProducto = productoService.crearProducto(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
     }
 
     @GetMapping
-    public ResponseEntity<List<Producto>> listar() {
-        return ResponseEntity.ok(productoService.listarProductos());
+    public ResponseEntity<List<ProductoCatalogoDTO>> listarCatalogo() {
+        return ResponseEntity.ok(productoService.listarCatalogoPublico());
     }
 }
