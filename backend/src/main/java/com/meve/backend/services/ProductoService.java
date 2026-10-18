@@ -69,4 +69,16 @@ public class ProductoService {
         }
         return catalogo;
     }
+
+    public List<Producto> listarProductosPorComercio(String comercioId) {
+        List<Producto> productosDelComercio = productoRepository.findByComercioId(comercioId);
+        List<Producto> activos = new ArrayList<>();
+
+        for (Producto producto : productosDelComercio) {
+            if (Boolean.TRUE.equals(producto.getActivo())) {
+                activos.add(producto);
+            }
+        }
+        return activos;
+    }
 }
