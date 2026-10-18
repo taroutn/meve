@@ -17,6 +17,7 @@ public class Comercio {
     private String descripcion;
     private String horarios; 
     
+    // Aun en desuso
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint ubicacion; 
     

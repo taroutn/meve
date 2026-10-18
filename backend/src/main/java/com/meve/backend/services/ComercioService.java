@@ -29,6 +29,6 @@ public class ComercioService {
     }
 
     public List<Comercio> listarComercios() {
-        return comercioRepository.findAll();
+        return comercioRepository.findByActivoTrue();
     }
 }
