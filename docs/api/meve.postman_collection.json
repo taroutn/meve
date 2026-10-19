@@ -358,6 +358,33 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"comercioId\": \"651a2b3c4d5e6f7000000010\",\r\n  \"nombre\": \"Coca-Cola 2.25L\",\r\n  \"precio\": 3500,\r\n  \"stock\": 20,\r\n  \"categoria\": \"Gaseosas\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
