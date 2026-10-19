@@ -29,6 +29,7 @@ public class ProductoService {
         Producto producto = new Producto();
         producto.setComercioId(request.getComercioId());
         producto.setNombre(request.getNombre());
+        producto.setCategoria(request.getCategoria().trim());
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
         producto.setActivo(true);
@@ -64,7 +65,8 @@ public class ProductoService {
                     producto.getNombre(),
                     producto.getPrecio(),
                     producto.getComercioId(),
-                    nombrePorComercioId.get(producto.getComercioId())
+                    nombrePorComercioId.get(producto.getComercioId()),
+                    producto.getCategoria()
             ));
         }
         return catalogo;

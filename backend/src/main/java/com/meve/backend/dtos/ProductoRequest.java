@@ -14,6 +14,9 @@ public class ProductoRequest {
     
     @NotBlank(message = "El nombre del producto no puede estar vacío")
     private String nombre;
+
+    @NotBlank(message = "La categoría es obligatoria")
+    private String categoria;
     
     @NotNull(message = "El precio es obligatorio")
     @Positive(message = "El precio debe ser mayor a cero")
