@@ -338,7 +338,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Devuelve una lista\", () => {\r\n    pm.expect(pm.response.json()).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Cada producto trae los datos de la ProductCard\", () => {\r\n    pm.response.json().forEach(p => {\r\n        pm.expect(p).to.have.all.keys(\"id\", \"nombre\", \"precio\", \"comercioId\", \"comercioNombre\");\r\n        pm.expect(p.precio).to.be.a(\"number\");\r\n    });\r\n});"
+                  "pm.test(\"Responde 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Devuelve una lista\", () => {\r\n    pm.expect(pm.response.json()).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Cada producto trae los datos de la ProductCard\", () => {\r\n    pm.response.json().forEach(p => {\r\n        pm.expect(p).to.have.all.keys(\"id\", \"nombre\", \"precio\", \"comercioId\", \"comercioNombre\", \"categoria\");\r\n        pm.expect(p.precio).to.be.a(\"number\");\r\n    });\r\n});"
                 ]
               }
             }
@@ -346,6 +346,33 @@
           "request": {
             "method": "GET",
             "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"comercioId\": \"651a2b3c4d5e6f7000000010\",\r\n  \"nombre\": \"Coca-Cola 2.25L\",\r\n  \"precio\": 3500,\r\n  \"stock\": 20,\r\n  \"categoria\": \"Gaseosas\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{base_url}}/api/productos",
               "host": [
