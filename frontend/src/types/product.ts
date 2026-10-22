@@ -4,5 +4,6 @@ export interface Product {
   precio: number;
   comercioId: string;
   comercioNombre: string;
+  categoria?: string;
   imagenUrl?: string; // Opcional
 }
