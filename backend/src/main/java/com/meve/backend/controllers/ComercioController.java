@@ -32,6 +32,13 @@ public class ComercioController {
         return ResponseEntity.ok(comercioService.listarComercios());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Comercio> obtenerDetalle(@PathVariable String id) {
+        return comercioService.obtenerComercioActivo(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{comercioId}/productos")
     public ResponseEntity<List<Producto>> obtenerCatalogoPorComercio(@PathVariable String comercioId) {
         return ResponseEntity.ok(productoService.listarProductosPorComercio(comercioId));
