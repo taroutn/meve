@@ -29,6 +29,7 @@ public class ProductoService {
         Producto producto = new Producto();
         producto.setComercioId(request.getComercioId());
         producto.setNombre(request.getNombre());
+        producto.setCategoria(request.getCategoria().trim());
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
         producto.setActivo(true);
@@ -64,9 +65,22 @@ public class ProductoService {
                     producto.getNombre(),
                     producto.getPrecio(),
                     producto.getComercioId(),
-                    nombrePorComercioId.get(producto.getComercioId())
+                    nombrePorComercioId.get(producto.getComercioId()),
+                    producto.getCategoria()
             ));
         }
         return catalogo;
+    }
+
+    public List<Producto> listarProductosPorComercio(String comercioId) {
+        List<Producto> productosDelComercio = productoRepository.findByComercioId(comercioId);
+        List<Producto> activos = new ArrayList<>();
+
+        for (Producto producto : productosDelComercio) {
+            if (Boolean.TRUE.equals(producto.getActivo())) {
+                activos.add(producto);
+            }
+        }
+        return activos;
     }
 }

@@ -17,4 +17,5 @@ public class Producto {
     private Double precio;
     private Integer stock;
     private Boolean activo = true;
+    private String categoria;
 }
