@@ -2,6 +2,7 @@ package com.meve.backend.repositories;
 
 import com.meve.backend.models.EstadoPedido;
 import com.meve.backend.models.Pedido;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,5 @@ public interface PedidoRepository extends MongoRepository<Pedido, String> {
     List<Pedido> findByComercioIdOrderByCreatedAtDesc(String comercioId);
     Optional<Pedido> findByCodigoTicket(String codigoTicket);
     List<Pedido> findByEstadoAndCreatedAtBefore(EstadoPedido estado, LocalDateTime fechaLimite);
+    List<Pedido> findByComercioIdAndCreatedAtAfter(String comercioId, LocalDateTime desde, Sort orden);
 }

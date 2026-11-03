@@ -73,9 +73,11 @@ Para garantizar la viabilidad temporal del Trabajo Final, quedan excluidos los s
      MONGO_URI="tu_uri_aqui" ./mvnw spring-boot:run
      ```
    * **Alternativa para IDEs:** Si usás VS Code, levantá el proyecto desde la pestaña "Run and Debug" (esto lee el `launch.json` que inyecta el `.env`). Si usás IntelliJ IDEA, agregá la URI en el campo "Environment Variables" de tu Run Configuration.
-   * **Prueba de Aislamiento de Datos (Multitenant):** 
-     1. Realizar un `POST` a `/api/comercios` para registrar un tenant y copiar su `id`.
-     2. Enviar peticiones a `/api/productos` enviando el header `X-Tenant-ID: <id_del_comercio>` para validar el aislamiento automático de datos.
+   * **Variables de entorno de seguridad:** además de `MONGO_URI`, el backend necesita `MEVE_JWT_SECRET` (clave para firmar los tokens, mínimo 32 caracteres; cada uno usa la suya). Opcional: con `MEVE_SEED_PASSWORD` se crean al arrancar tres usuarios de prueba si no existen (`admin@meve.test`, `burger@meve.test`, `otro@meve.test`).
+   * **Prueba de Aislamiento de Datos (Multitenant):**
+     1. `POST /api/auth/login` con un usuario vendedor. La colección de Postman guarda el token en `{{token}}`.
+     2. `POST /api/productos` con `Authorization: Bearer <token>`: el producto se crea en el comercio del token, aunque el body indique otro.
+     3. `GET /api/comercios/{id}/pedidos` con el token de un vendedor de otro comercio responde `403`.
 
 3. **Levantar el Frontend (React + TypeScript):**
    ```bash

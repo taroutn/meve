@@ -7,12 +7,19 @@ import com.meve.backend.repositories.ComercioRepository;
 import com.meve.backend.repositories.PedidoRepository;
 import com.meve.backend.repositories.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +36,9 @@ public class PedidoService {
 
     @Autowired
     private ProductoRepository productoRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public Pedido registrarPedido(PedidoRequest request) {
         Comercio comercio = comercioRepository.findById(request.getComercioId())
@@ -114,6 +124,73 @@ public class PedidoService {
         pedido.setWhatsappUrl(generarWhatsappUrl(comercio, pedido));
 
         return pedidoRepository.save(pedido);
+    }
+
+    // Panel del vendedor (RF-29): pedidos de hoy de SU comercio, ordenados por franja horaria.
+    // Si se pasa un estado, devuelve solo los pedidos en ese estado.
+    public List<Pedido> pedidosDelDia(String comercioId, String comercioIdDelVendedor, EstadoPedido estado) {
+        if (!comercioId.equals(comercioIdDelVendedor)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo podés ver los pedidos de tu comercio");
+        }
+
+        LocalDateTime inicioDelDia = LocalDate.now().atStartOfDay();
+        Sort orden = Sort.by("franjaHoraria").and(Sort.by("createdAt"));
+        List<Pedido> pedidos = pedidoRepository.findByComercioIdAndCreatedAtAfter(comercioId, inicioDelDia, orden);
+
+        if (estado == null) {
+            return pedidos;
+        }
+        return pedidos.stream()
+                .filter(p -> p.getEstado() == estado)
+                .toList();
+    }
+
+    // El vendedor confirma que el pedido está pagado: PENDIENTE_PAGO -> PAGADO_CONFIRMADO
+    public Pedido confirmarPago(String pedidoId, String comercioIdDelVendedor) {
+        Pedido pedido = buscarPedidoDelComercio(pedidoId, comercioIdDelVendedor);
+        return cambiarEstado(pedido, EstadoPedido.PAGADO_CONFIRMADO);
+    }
+
+    // El cliente retira (RF-30): se verifica el código del ticket. PAGADO_CONFIRMADO -> RETIRADO
+    public Pedido retirar(String pedidoId, String codigoTicket, String comercioIdDelVendedor) {
+        Pedido pedido = buscarPedidoDelComercio(pedidoId, comercioIdDelVendedor);
+
+        if (!pedido.getCodigoTicket().equalsIgnoreCase(codigoTicket.trim())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El código del ticket no coincide con el pedido");
+        }
+        return cambiarEstado(pedido, EstadoPedido.RETIRADO);
+    }
+
+    // El pedido tiene que existir y ser del comercio del vendedor.
+    // Si es de otro comercio respondemos 404 (y no 403) para no revelar que ese pedido existe.
+    private Pedido buscarPedidoDelComercio(String pedidoId, String comercioIdDelVendedor) {
+        return pedidoRepository.findById(pedidoId)
+                .filter(p -> p.getComercioId().equals(comercioIdDelVendedor))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+    }
+
+    // Cambia el estado solo si el pedido sigue en el estado anterior que corresponde.
+    // Es un update condicional, igual que en la expiración (#28): si el job lo expiró
+    // un instante antes, Mongo no modifica nada y respondemos 409.
+    private Pedido cambiarEstado(Pedido pedido, EstadoPedido nuevoEstado) {
+        EstadoPedido estadoAnterior = (nuevoEstado == EstadoPedido.RETIRADO)
+                ? EstadoPedido.PAGADO_CONFIRMADO
+                : EstadoPedido.PENDIENTE_PAGO;
+
+        Query query = new Query(Criteria.where("id").is(pedido.getId())
+                .and("estado").is(estadoAnterior));
+        Update update = new Update()
+                .set("estado", nuevoEstado)
+                .set("updatedAt", LocalDateTime.now());
+
+        Pedido actualizado = mongoTemplate.findAndModify(
+                query, update, FindAndModifyOptions.options().returnNew(true), Pedido.class);
+
+        if (actualizado == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "El pedido está en estado " + pedido.getEstado() + " y no puede pasar a " + nuevoEstado);
+        }
+        return actualizado;
     }
 
     private String generarWhatsappUrl(Comercio comercio, Pedido pedido) {
