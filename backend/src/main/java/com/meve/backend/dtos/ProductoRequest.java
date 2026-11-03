@@ -7,11 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
-public class ProductoRequest {
-    
-    @NotBlank(message = "El ID del comercio es obligatorio")
-    private String comercioId;
-    
+public class ProductoRequest { 
     @NotBlank(message = "El nombre del producto no puede estar vacío")
     private String nombre;
 
