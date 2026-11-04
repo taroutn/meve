@@ -1,0 +1,1064 @@
+{
+  "info": {
+    "_postman_id": "41072f34-f043-49fd-8dad-ba089dc08093",
+    "name": "MeVe E2E - Sprint 4",
+    "description": "Pruebas de punta a punta del Sprint 4 (tarjeta #32): login y roles, pedido Click & Collect con descuento de stock y cupo, panel del vendedor, confirmación de pago, retiro con ticket y acceso cruzado entre comercios.\n\nCómo correrla:\n1. Backend levantado y environment \"MeVe - Local\" seleccionado.\n2. Variable de entorno password_prueba cargada (clave de los usuarios @meve.test).\n3. Botón Run (Runner) sobre esta colección, en orden.\n\nOjo: cada corrida deja un pedido RETIRADO, así que consume 1 unidad del producto y 1 cupo de una franja de forma permanente (los cupos no se reinician solos).\n\nLas variables que guarda la colección llevan el prefijo e2e_ (e2e_pedidoId, e2e_codigoTicket) a propósito: en Postman el environment le gana a las variables de colección, y \"MeVe - Local\" ya tiene pedidoId y codigoTicket.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55203970",
+    "_collection_link": "https://go.postman.co/collection/55203970-41072f34-f043-49fd-8dad-ba089dc08093?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "01 - Login vendedor Burger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login de Burger responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
+                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    });",
+                  "    pm.collectionVariables.set(\"token_burger\", body.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"burger@meve.test\",\n  \"password\": \"{{password_prueba}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 - Login vendedor de otro comercio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login de otro comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
+                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    });",
+                  "    pm.collectionVariables.set(\"token_otro\", body.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"otro@meve.test\",\n  \"password\": \"{{password_prueba}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 - Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login de admin responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
+                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    });",
+                  "    pm.collectionVariables.set(\"token_admin\", body.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@meve.test\",\n  \"password\": \"{{password_prueba}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 - Login con clave incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Clave incorrecta responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"burger@meve.test\",\n  \"password\": \"clave-incorrecta\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Permisos por rol",
+      "item": [
+        {
+          "name": "05 - Crear producto sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin token responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto E2E (no se crea)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 100,\n  \"stock\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 - Crear producto como admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"El admin no puede cargar productos (403)\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto E2E (no se crea)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 100,\n  \"stock\": 0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Pedido Click & Collect",
+      "item": [
+        {
+          "name": "07 - Elegir franja con cupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Detalle del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const comercio = pm.response.json();",
+                  "const conCupo = (comercio.franjas || [])",
+                  "    .filter(f => f.cuposDisponibles > 0)",
+                  "    .sort((a, b) => b.cuposDisponibles - a.cuposDisponibles);",
+                  "pm.test(\"Hay al menos una franja con cupo disponible\", () => pm.expect(conCupo.length).to.be.above(0));",
+                  "if (conCupo.length > 0) {",
+                  "    pm.collectionVariables.set(\"franja\", conCupo[0].rango);",
+                  "    pm.collectionVariables.set(\"cuposAntes\", conCupo[0].cuposDisponibles);",
+                  "    console.log(\"Franja elegida: \" + conCupo[0].rango + \" (\" + conCupo[0].cuposDisponibles + \" cupos)\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 - Stock inicial del producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "pm.test(\"El producto existe y tiene stock\", () => {",
+                  "    pm.expect(producto, \"producto\").to.exist;",
+                  "    pm.expect(producto.stock).to.be.above(0);",
+                  "});",
+                  "if (producto) {",
+                  "    pm.collectionVariables.set(\"stockAntes\", producto.stock);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 - Crear pedido como guest",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pedido creado (201)\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const pedido = pm.response.json();",
+                  "    pm.test(\"Queda en PENDIENTE_PAGO\", () => pm.expect(pedido.estado).to.eql(\"PENDIENTE_PAGO\"));",
+                  "    pm.test(\"Ticket con formato MEVE-XXXXXX\", () => pm.expect(pedido.codigoTicket).to.match(/^MEVE-[A-Z0-9]{6}$/));",
+                  "    pm.test(\"Usa la franja elegida\", () => pm.expect(pedido.franjaHoraria).to.eql(pm.collectionVariables.get(\"franja\")));",
+                  "    pm.test(\"Genera el link de WhatsApp\", () => pm.expect(pedido.whatsappUrl).to.match(/^https:\\/\\/wa\\.me\\//));",
+                  "    pm.collectionVariables.set(\"e2e_pedidoId\", pedido.id);",
+                  "    pm.collectionVariables.set(\"e2e_codigoTicket\", pedido.codigoTicket);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comercioId\": \"{{comercioId}}\",\n  \"compradorNombre\": \"Prueba E2E\",\n  \"compradorTelefono\": \"3884000000\",\n  \"franjaHoraria\": \"{{franja}}\",\n  \"items\": [\n    {\n      \"productoId\": \"{{productoId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 - Stock descontado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "const stockAntes = Number(pm.collectionVariables.get(\"stockAntes\"));",
+                  "pm.test(\"El pedido descontó 1 unidad de stock\", () => pm.expect(producto.stock).to.eql(stockAntes - 1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 - Cupo descontado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Detalle del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const franja = pm.response.json().franjas.find(f => f.rango === pm.collectionVariables.get(\"franja\"));",
+                  "const cuposAntes = Number(pm.collectionVariables.get(\"cuposAntes\"));",
+                  "pm.test(\"El pedido ocupó 1 cupo de la franja\", () => pm.expect(franja.cuposDisponibles).to.eql(cuposAntes - 1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Panel y acceso cruzado",
+      "item": [
+        {
+          "name": "12 - Panel del vendedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Panel responde 200\", () => pm.response.to.have.status(200));",
+                  "const pedidos = pm.response.json();",
+                  "pm.test(\"Devuelve una lista\", () => pm.expect(pedidos).to.be.an(\"array\"));",
+                  "pm.test(\"Incluye el pedido recién creado\", () => {",
+                  "    pm.expect(pedidos.map(p => p.id)).to.include(pm.collectionVariables.get(\"e2e_pedidoId\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13 - Panel sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Sin token responde 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14 - Panel de Burger con token de otro comercio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Otro vendedor no ve los pedidos de Burger (403)\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Pago y retiro",
+      "item": [
+        {
+          "name": "15 - Retirar antes de pagar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No se puede retirar un pedido sin pagar (409)\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_codigoTicket}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/retirar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16 - Confirmar pago desde otro comercio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Otro vendedor no encuentra el pedido (404)\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/confirmar-pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "confirmar-pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17 - Confirmar pago",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago confirmado (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Pasa a PAGADO_CONFIRMADO\", () => pm.expect(pm.response.json().estado).to.eql(\"PAGADO_CONFIRMADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/confirmar-pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "confirmar-pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "18 - Confirmar pago repetido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No se puede confirmar dos veces (409)\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/confirmar-pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "confirmar-pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "19 - Retirar con ticket equivocado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ticket equivocado responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"MEVE-000000\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/retirar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "20 - Retirar desde otro comercio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Otro vendedor no encuentra el pedido (404)\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_codigoTicket}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/retirar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "21 - Retirar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pedido retirado (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Pasa a RETIRADO\", () => pm.expect(pm.response.json().estado).to.eql(\"RETIRADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_codigoTicket}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/retirar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "retirar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "22 - Panel filtrado por RETIRADO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Panel filtrado responde 200\", () => pm.response.to.have.status(200));",
+                  "const pedidos = pm.response.json();",
+                  "pm.test(\"Incluye el pedido retirado\", () => pm.expect(pedidos.map(p => p.id)).to.include(pm.collectionVariables.get(\"e2e_pedidoId\")));",
+                  "pm.test(\"Todos los pedidos están en RETIRADO\", () => pedidos.forEach(p => pm.expect(p.estado).to.eql(\"RETIRADO\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/pedidos?estado=RETIRADO",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "RETIRADO"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "comercioId",
+      "value": "651a2b3c4d5e6f7000000002"
+    },
+    {
+      "key": "productoId",
+      "value": "6acd7bc61511938f26fad51d"
+    },
+    {
+      "key": "token_burger",
+      "value": ""
+    },
+    {
+      "key": "token_otro",
+      "value": ""
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
+    {
+      "key": "franja",
+      "value": ""
+    },
+    {
+      "key": "cuposAntes",
+      "value": ""
+    },
+    {
+      "key": "stockAntes",
+      "value": ""
+    },
+    {
+      "key": "e2e_pedidoId",
+      "value": ""
+    },
+    {
+      "key": "e2e_codigoTicket",
+      "value": ""
+    }
+  ]
+}
