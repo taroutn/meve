@@ -1,14 +1,16 @@
-import './styles/variables.css'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-import { CarritoProvider } from './context/CarritoProvider'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.tsx';
+import { AccessibilityProvider } from './context/AccessibilityContext.tsx';
+import AccessibilityBar from './components/AccessibilityBar.tsx';
+import './index.css';
+import './styles/variables.css';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <CarritoProvider>
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <AccessibilityProvider>
+      <AccessibilityBar />
       <App />
-    </CarritoProvider>
-  </StrictMode>,
-)
+    </AccessibilityProvider>
+  </React.StrictMode>,
+);
