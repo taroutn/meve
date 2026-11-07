@@ -123,6 +123,12 @@ public class PedidoService {
 
         pedido.setWhatsappUrl(generarWhatsappUrl(comercio, pedido));
 
+        String prefId = "PREF-SBX-" + pedido.getCodigoTicket();
+        pedido.setPreferenceId(prefId);
+        pedido.setSandboxInitPoint(
+            "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + prefId
+        );
+
         return pedidoRepository.save(pedido);
     }
 
@@ -214,5 +220,31 @@ public class PedidoService {
 
         String textoCodificado = URLEncoder.encode(mensaje.toString(), StandardCharsets.UTF_8);
         return "https://wa.me/" + telefono + "?text=" + textoCodificado;
+    }
+
+    public Pedido confirmarPagoIdempotente(String pedidoIdOCodigo, String paymentId) {
+        Pedido pedido = pedidoRepository.findById(pedidoIdOCodigo)
+                .or(() -> pedidoRepository.findByCodigoTicket(pedidoIdOCodigo))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado: " + pedidoIdOCodigo));
+
+        // Si ya fue confirmado o retirado antes, retornamos el pedido tal cual sin fallar
+        if (pedido.getEstado() == EstadoPedido.PAGADO_CONFIRMADO || pedido.getEstado() == EstadoPedido.RETIRADO) {
+            return pedido;
+        }
+
+        // Validar que no esté expirado o cancelado
+        if (pedido.getEstado() == EstadoPedido.EXPIRADO || pedido.getEstado() == EstadoPedido.CANCELADO) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "No se puede confirmar el pago de un pedido en estado " + pedido.getEstado()
+            );
+        }
+
+        // Transición válida de PENDIENTE_PAGO -> PAGADO_CONFIRMADO
+        pedido.setEstado(EstadoPedido.PAGADO_CONFIRMADO);
+        pedido.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-" + System.currentTimeMillis());
+        pedido.setUpdatedAt(LocalDateTime.now());
+
+        return pedidoRepository.save(pedido);
     }
 }

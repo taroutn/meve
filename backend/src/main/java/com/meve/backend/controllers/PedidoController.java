@@ -39,4 +39,22 @@ public class PedidoController {
                                             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(pedidoService.retirar(id, request.getCodigoTicket(), UsuarioActual.comercioId(jwt)));
     }
+
+    @PostMapping("/{id}/confirmar-pago")
+    public ResponseEntity<Pedido> confirmarPagoSandbox(
+            @PathVariable String id,
+            @RequestParam(required = false) String paymentId
+    ) {
+        Pedido pedidoConfirmado = pedidoService.confirmarPagoIdempotente(id, paymentId);
+        return ResponseEntity.ok(pedidoConfirmado);
+    }
+
+    @PostMapping("/webhook")
+    public ResponseEntity<Pedido> recibirWebhookMercadoPago(
+            @RequestParam(name = "pedidoId") String pedidoId,
+            @RequestParam(name = "data.id", required = false) String paymentId
+    ) {
+        Pedido pedidoConfirmado = pedidoService.confirmarPagoIdempotente(pedidoId, paymentId);
+        return ResponseEntity.ok(pedidoConfirmado);
+    }
 }
