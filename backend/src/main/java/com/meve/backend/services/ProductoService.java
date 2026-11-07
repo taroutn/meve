@@ -25,9 +25,11 @@ public class ProductoService {
     @Autowired
     private ComercioRepository comercioRepository;
 
-    public Producto crearProducto(ProductoRequest request) {
+    // El comercio sale del token del vendedor, nunca del body:
+    // así nadie puede cargar productos en un comercio que no es el suyo
+    public Producto crearProducto(ProductoRequest request, String comercioIdDelVendedor) {
         Producto producto = new Producto();
-        producto.setComercioId(request.getComercioId());
+        producto.setComercioId(comercioIdDelVendedor);
         producto.setNombre(request.getNombre());
         producto.setCategoria(request.getCategoria().trim());
         producto.setPrecio(request.getPrecio());

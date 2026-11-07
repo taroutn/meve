@@ -165,6 +165,49 @@
               "body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Unauthorized\",\n    \"status\": 401,\n    \"detail\": \"Token JWT ausente o invalido\",\n    \"instance\": \"/api/comercios\"\n}"
             }
           ]
+        },
+        {
+          "name": "Listar Comercios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Comercio",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "651a2b3c4d5e6f7000000002"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -245,16 +288,10 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {\r",
-                  "    const data = pm.response.json();\r",
-                  "    pm.environment.set(\"token\", data.token);\r",
-                  "    console.log(\"Token guardado en el environment\");\r",
-                  "}"
-                ],
                 "type": "text/javascript",
-                "packages": {},
-                "requests": {}
+                "exec": [
+                  "if (pm.response.code === 200) {\r\n    const data = pm.response.json();\r\n    pm.environment.set(\"token\", data.token);\r\n    console.log(\"Token guardado en el environment\");\r\n}"
+                ]
               }
             }
           ],
@@ -263,7 +300,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"email\": \"rosa@ejemplo.com\",\r\n  \"password\": \"Password123!\"\r\n}",
+              "raw": "{\r\n  \"email\": \"burger@meve.test\",\r\n  \"password\": \"{{password_prueba}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -343,9 +380,21 @@
               }
             }
           ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{base_url}}/api/productos",
               "host": [
@@ -362,11 +411,21 @@
         {
           "name": "Crear Producto",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"comercioId\": \"651a2b3c4d5e6f7000000010\",\r\n  \"nombre\": \"Coca-Cola 2.25L\",\r\n  \"precio\": 3500,\r\n  \"stock\": 20,\r\n  \"categoria\": \"Gaseosas\"\r\n}",
+              "raw": "   {\r\n     \"nombre\": \"Coca-Cola 2.25L\",\r\n     \"precio\": 3500,\r\n     \"stock\": 20,\r\n     \"categoria\": \"Gaseosas\"\r\n   }",
               "options": {
                 "raw": {
                   "language": "json"
@@ -381,6 +440,148 @@
               "path": [
                 "api",
                 "productos"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Crear Pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {\r\n    const pedido = pm.response.json();\r\n    pm.environment.set(\"pedidoId\", pedido.id);\r\n    pm.environment.set(\"codigoTicket\", pedido.codigoTicket);\r\n    console.log(\"Pedido guardado: \" + pedido.codigoTicket);\r\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"comercioId\": \"651a2b3c4d5e6f7000000002\",\r\n  \"compradorNombre\": \"Prueba QA\",\r\n  \"compradorTelefono\": \"3884000000\",\r\n  \"franjaHoraria\": \"17:00 - 18:00\",\r\n  \"items\": [\r\n    { \"productoId\": \"6acd7bc61511938f26fad51d\", \"cantidad\": 1 }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Panel del Vendedor",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/651a2b3c4d5e6f7000000002/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "651a2b3c4d5e6f7000000002",
+                "pedidos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar Pago",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedidoId}}/confirmar-pago",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedidoId}}",
+                "confirmar-pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retirar Pedido",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "   { \"codigoTicket\": \"{{codigoTicket}}\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedidoId}}/retirar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedidoId}}",
+                "retirar"
               ]
             }
           },

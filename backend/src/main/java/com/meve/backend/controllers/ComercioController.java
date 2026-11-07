@@ -1,12 +1,18 @@
 package com.meve.backend.controllers;
 
 import com.meve.backend.models.Comercio;
+import com.meve.backend.models.EstadoPedido;
+import com.meve.backend.models.Pedido;
 import com.meve.backend.models.Producto;
+import com.meve.backend.security.UsuarioActual;
 import com.meve.backend.services.ComercioService;
+import com.meve.backend.services.PedidoService;
 import com.meve.backend.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +26,9 @@ public class ComercioController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private PedidoService pedidoService;
 
     @PostMapping
     public ResponseEntity<Comercio> crear(@RequestBody Comercio comercio) {
@@ -42,5 +51,14 @@ public class ComercioController {
     @GetMapping("/{comercioId}/productos")
     public ResponseEntity<List<Producto>> obtenerCatalogoPorComercio(@PathVariable String comercioId) {
         return ResponseEntity.ok(productoService.listarProductosPorComercio(comercioId));
+    }
+
+    // Panel del vendedor: solo con token de VENDEDOR (SecurityConfig) y solo de su comercio (PedidoService)
+    @GetMapping("/{comercioId}/pedidos")
+    public ResponseEntity<List<Pedido>> panelDePedidos(@PathVariable String comercioId,
+                                                        @RequestParam(required = false) EstadoPedido estado,
+                                                        @AuthenticationPrincipal Jwt jwt) {
+        String comercioDelVendedor = UsuarioActual.comercioId(jwt);
+        return ResponseEntity.ok(pedidoService.pedidosDelDia(comercioId, comercioDelVendedor, estado));
     }
 }
