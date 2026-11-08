@@ -34,9 +34,15 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/confirmar-pago").hasRole("VENDEDOR")
                 .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/retirar").hasRole("VENDEDOR")
                 .requestMatchers(HttpMethod.POST, "/api/productos").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.GET, "/api/productos/mios").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/*").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PATCH, "/api/productos/*/publicacion").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/*").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PUT, "/api/comercios/*").hasRole("VENDEDOR")
 
                 // 2. Rutas del SUPERADMIN
                 .requestMatchers(HttpMethod.POST, "/api/comercios").hasRole("SUPERADMIN")
+                .requestMatchers("/api/admin/**").hasRole("SUPERADMIN")
 
                 // 3. Rutas públicas (Guest): sin token
                 .requestMatchers("/error").permitAll()

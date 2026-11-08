@@ -1017,6 +1017,1268 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "6. Gestión del comercio y catálogo",
+      "item": [
+        {
+          "name": "23 - Editar comercio (Burger)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"horarios\": \"Martes a Domingos de 19:00 a 00:00\",\r\n  \"franjas\": [\r\n    { \"rango\": \"10:00 - 11:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"11:00 - 12:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"17:00 - 18:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"18:00 - 19:00\", \"capacidadMaxima\": 3 }\r\n  ],\r\n  \"lat\": -24.2562,\r\n  \"lng\": -65.2114\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "24 - Editar comercio de Burger con token de otro",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"horarios\": \"Martes a Domingos de 19:00 a 00:00\",\r\n  \"franjas\": [\r\n    { \"rango\": \"10:00 - 11:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"11:00 - 12:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"17:00 - 18:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"18:00 - 19:00\", \"capacidadMaxima\": 3 }\r\n  ],\r\n  \"lat\": -24.2562,\r\n  \"lng\": -65.2114\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "25 - Crear comercio de prueba (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Crear comercio como admin responde 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"El comercio nace PENDIENTE e inactivo\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"PENDIENTE\");",
+                  "        pm.expect(body.activo).to.eql(false);",
+                  "    });",
+                  "    pm.collectionVariables.set(\"comercioPruebaId\", body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comercio de prueba moderacion\",\n  \"descripcion\": \"Creado por la coleccion E2E para probar la tarea 35\",\n  \"whatsapp\": \"3884000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ]
+            },
+            "description": "Crea un comercio solo para probar la moderación (tarea 35). Nace PENDIENTE y al final de la carpeta queda SUSPENDIDO, así que no se ve en la vitrina. Cada corrida crea uno nuevo."
+          },
+          "response": []
+        },
+        {
+          "name": "26 - Listar todos los comercios (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Listado de admin responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const lista = pm.response.json();",
+                  "    const prueba = lista.find(c => c.id === pm.collectionVariables.get(\"comercioPruebaId\"));",
+                  "    pm.test(\"Incluye el comercio de prueba en estado PENDIENTE\", () => {",
+                  "        pm.expect(prueba, \"comercio de prueba\").to.exist;",
+                  "        pm.expect(prueba.estado).to.eql(\"PENDIENTE\");",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin ve todos los comercios, incluidos los PENDIENTE que la vitrina no muestra."
+          },
+          "response": []
+        },
+        {
+          "name": "27 - Listar todos los comercios como vendedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un vendedor no puede usar las rutas de admin (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios"
+              ]
+            },
+            "description": "Todo /api/admin/** exige rol SUPERADMIN: un vendedor recibe 403."
+          },
+          "response": []
+        },
+        {
+          "name": "28 - Comercio pendiente no aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio pendiente no se ve en la vitrina (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Un comercio PENDIENTE no es visible para los compradores: el detalle público responde 404."
+          },
+          "response": []
+        },
+        {
+          "name": "29 - Aprobar comercio de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Aprobar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda ACTIVO y visible (activo = true)\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"ACTIVO\");",
+                  "        pm.expect(body.activo).to.eql(true);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin aprueba el comercio. Pasa a ACTIVO y activo = true."
+          },
+          "response": []
+        },
+        {
+          "name": "30 - Comercio aprobado aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio aprobado se ve en la vitrina (200)\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Después de aprobarlo, el detalle público del comercio responde 200."
+          },
+          "response": []
+        },
+        {
+          "name": "31 - Volver a PENDIENTE (rechazado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No se puede volver a PENDIENTE (400)\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"PENDIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "La moderación solo aprueba o suspende: PENDIENTE es el estado inicial y no se puede volver a él (400)."
+          },
+          "response": []
+        },
+        {
+          "name": "32 - Estado inválido (rechazado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un estado que no existe se rechaza (400)\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"APROBADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "El estado es un enum (PENDIENTE, ACTIVO, SUSPENDIDO): cualquier otro valor se rechaza con 400 sin llegar a la base."
+          },
+          "response": []
+        },
+        {
+          "name": "33 - Suspender comercio de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Suspender responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda SUSPENDIDO y oculto (activo = false)\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"SUSPENDIDO\");",
+                  "        pm.expect(body.activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin suspende el comercio. Pasa a SUSPENDIDO y activo = false. Queda así al terminar la carpeta."
+          },
+          "response": []
+        },
+        {
+          "name": "34 - Comercio suspendido no aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio suspendido no se ve en la vitrina (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Al suspenderlo, el comercio desaparece de la vitrina: el detalle público vuelve a responder 404."
+          },
+          "response": []
+        },
+        {
+          "name": "35 - Vendedor intenta aprobarse solo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un vendedor no puede moderar comercios (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioId}}",
+                "estado"
+              ]
+            },
+            "description": "Un vendedor no puede cambiar el estado de ningún comercio, ni siquiera el suyo: la moderación es solo del SuperAdmin (403)."
+          },
+          "response": []
+        },
+        {
+          "name": "36 - Mis productos (Burger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const lista = pm.response.json();",
+                  "    pm.test(\"Todos son de Burger y ninguno está eliminado\", () => {",
+                  "        lista.forEach(p => {",
+                  "            pm.expect(p.comercioId).to.eql(pm.collectionVariables.get(\"comercioId\"));",
+                  "            pm.expect(p.eliminado).to.not.eql(true);",
+                  "        });",
+                  "    });",
+                  "    pm.test(\"Incluye el producto de Burger que usa la colección\", () => {",
+                  "        pm.expect(lista.map(p => p.id)).to.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El vendedor ve sus productos activos y pausados, nunca los eliminados ni los de otro comercio. El comercio sale del token."
+          },
+          "response": []
+        },
+        {
+          "name": "37 - Pausar producto de Burger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Pausar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto queda pausado (activo = false)\", () => {",
+                  "        pm.expect(pm.response.json().activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}/publicacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}",
+                "publicacion"
+              ]
+            },
+            "description": "RF-10: el vendedor pausa el producto (activo = false). El request 40 lo vuelve a publicar."
+          },
+          "response": []
+        },
+        {
+          "name": "38 - Producto pausado no aparece en el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto pausado no se ve en el catálogo\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.not.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "El catálogo público del comercio solo muestra productos activos: el pausado no aparece."
+          },
+          "response": []
+        },
+        {
+          "name": "39 - Producto pausado sigue en mis productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "    pm.test(\"El producto pausado sigue en la lista del vendedor, con activo = false\", () => {",
+                  "        pm.expect(producto, \"producto pausado\").to.exist;",
+                  "        pm.expect(producto.activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El vendedor sigue viendo el producto pausado en su panel, para poder reactivarlo."
+          },
+          "response": []
+        },
+        {
+          "name": "40 - Reactivar producto de Burger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Reactivar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto vuelve a estar publicado (activo = true)\", () => {",
+                  "        pm.expect(pm.response.json().activo).to.eql(true);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}/publicacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}",
+                "publicacion"
+              ]
+            },
+            "description": "RF-10: el vendedor vuelve a publicar el producto (activo = true). Deja el producto como estaba antes del request 37."
+          },
+          "response": []
+        },
+        {
+          "name": "41 - Producto reactivado vuelve al catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto reactivado vuelve a verse en el catálogo\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "Después de reactivarlo, el producto vuelve a aparecer en el catálogo público del comercio."
+          },
+          "response": []
+        },
+        {
+          "name": "42 - Editar producto de Burger con token de otro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Otro vendedor no puede editar productos de Burger (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Intento de otro comercio\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 1,\n  \"stock\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}"
+              ]
+            },
+            "description": "Aislamiento por comercio: un vendedor no puede modificar productos de otro comercio (403). El body es válido a propósito, para que el rechazo venga de la validación de pertenencia y no de un error de datos."
+          },
+          "response": []
+        },
+        {
+          "name": "43 - Crear producto de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Crear producto responde 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda asociado a Burger y activo\", () => {",
+                  "        pm.expect(body.comercioId).to.eql(pm.collectionVariables.get(\"comercioId\"));",
+                  "        pm.expect(body.activo).to.eql(true);",
+                  "    });",
+                  "    pm.collectionVariables.set(\"productoPruebaId\", body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 100,\n  \"stock\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "description": "Crea un producto solo para probar la edición y la baja lógica, así no se toca ningún producto real. El request 45 lo elimina."
+          },
+          "response": []
+        },
+        {
+          "name": "44 - Editar producto de prueba (precio y stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Editar producto responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Se guardaron el nombre, el precio y el stock nuevos\", () => {",
+                  "        pm.expect(body.nombre).to.eql(\"Producto de prueba E2E (editado)\");",
+                  "        pm.expect(body.precio).to.eql(150);",
+                  "        pm.expect(body.stock).to.eql(12);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E (editado)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 150,\n  \"stock\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "RF-08 y RF-11: el vendedor modifica los datos de su producto y ajusta el stock a mano."
+          },
+          "response": []
+        },
+        {
+          "name": "45 - Eliminar producto de prueba (baja lógica)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Eliminar producto responde 204\", () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "RF-09: baja lógica. El documento queda en la base (eliminado = true, activo = false) para no romper pedidos históricos. Responde 204 sin body."
+          },
+          "response": []
+        },
+        {
+          "name": "46 - Editar producto eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un producto eliminado no se puede editar (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E (resucitado)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 150,\n  \"stock\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "Un producto eliminado ya no existe para el negocio: no se puede editar ni reactivar (404)."
+          },
+          "response": []
+        },
+        {
+          "name": "47 - Producto eliminado no aparece en mis productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto eliminado ya no aparece en la lista del vendedor\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.not.include(pm.collectionVariables.get(\"productoPruebaId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El producto dado de baja desaparece también del panel del vendedor."
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -1058,6 +2320,14 @@
     },
     {
       "key": "e2e_codigoTicket",
+      "value": ""
+    },
+    {
+      "key": "comercioPruebaId",
+      "value": ""
+    },
+    {
+      "key": "productoPruebaId",
       "value": ""
     }
   ]

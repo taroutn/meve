@@ -18,4 +18,7 @@ public class Producto {
     private Integer stock;
     private Boolean activo = true;
     private String categoria;
+// Baja lógica (RF-09): el producto deja de existir para la vitrina y el vendedor,
+// pero el documento queda para no romper los pedidos históricos que lo referencian
+private Boolean eliminado = false;
 }
