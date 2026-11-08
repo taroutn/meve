@@ -31,7 +31,14 @@ public class ProductoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductoCatalogoDTO>> listarCatalogo() {
-        return ResponseEntity.ok(productoService.listarCatalogoPublico());
+    public ResponseEntity<List<ProductoCatalogoDTO>> listarCatalogo(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Boolean disponible,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) Double radioKm
+    ) {
+        return ResponseEntity.ok(productoService.listarCatalogoPublico(q, categoria, disponible, lat, lng, radioKm));
     }
 }

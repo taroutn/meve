@@ -37,8 +37,12 @@ public class ComercioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Comercio>> listar() {
-        return ResponseEntity.ok(comercioService.listarComercios());
+    public ResponseEntity<List<Comercio>> listar(
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) Double radioKm
+    ) {
+        return ResponseEntity.ok(comercioService.listarComercios(lat, lng, radioKm));
     }
 
     @GetMapping("/{id}")
