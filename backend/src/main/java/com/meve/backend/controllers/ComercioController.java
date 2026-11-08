@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import com.meve.backend.dtos.ComercioUpdateRequest;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -60,5 +62,13 @@ public class ComercioController {
                                                         @AuthenticationPrincipal Jwt jwt) {
         String comercioDelVendedor = UsuarioActual.comercioId(jwt);
         return ResponseEntity.ok(pedidoService.pedidosDelDia(comercioId, comercioDelVendedor, estado));
+    }
+    // Configuración del comercio: solo su propio VENDEDOR (SecurityConfig + ComercioService)
+    @PutMapping("/{id}")
+    public ResponseEntity<Comercio> actualizar(@PathVariable String id,
+                                                @Valid @RequestBody ComercioUpdateRequest request,
+                                                @AuthenticationPrincipal Jwt jwt) {
+        String comercioDelVendedor = UsuarioActual.comercioId(jwt);
+        return ResponseEntity.ok(comercioService.actualizarComercio(id, request, comercioDelVendedor));
     }
 }

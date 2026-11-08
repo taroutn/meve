@@ -32,5 +32,5 @@ public class Comercio {
     ));
 
     private boolean activo = false;
-    private String estado = "PENDIENTE";
+    private EstadoComercio estado = EstadoComercio.PENDIENTE;
 }
