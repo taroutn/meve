@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCarrito } from '../hooks/useCarrito';
 import CarritoDrawer from './CarritoDrawer';
+import LogoMeve from './LogoMeve';
 import './navbar.css';
 
 export default function Navbar() {
@@ -11,9 +12,10 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-logo">
-          <Link to="/">MeVe</Link>
+        <div className="navbar-brand">
+          <LogoMeve width={100} /> 
         </div>
+
         <div className="navbar-links">
           <Link to="/">Inicio</Link>
           <Link to="/comercios">Comercios</Link>

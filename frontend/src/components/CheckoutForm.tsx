@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCarrito } from '../hooks/useCarrito';
 import type { PedidoRequest, PedidoResponse } from '../types/pedido';
+import TicketSuccess from './TicketSuccess'; // Importamos el componente del ticket
 import './CheckoutForm.css';
 
 interface CheckoutFormProps {
@@ -12,6 +13,9 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
   const { items, total, vaciar } = useCarrito();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // NUEVO ESTADO: Guarda los datos devueltos por el backend
+  const [pedidoConfirmado, setPedidoConfirmado] = useState<PedidoResponse | undefined>(undefined);
 
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -24,14 +28,13 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     setLoading(true);
     setError(null);
 
-    // Mapeamos los datos exactamente como los espera el backend de Lautaro
     const pedidoData: PedidoRequest = {
       comercioId: items[0].comercioId,
       compradorNombre: nombre,
       compradorTelefono: telefono,
       franjaHoraria,
       items: items.map(item => ({
-        productoId: item.id, // Traducimos 'id' a 'productoId'
+        productoId: item.id,
         cantidad: item.cantidad,
         precio: item.precio,
         nombre: item.nombre
@@ -53,7 +56,9 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
 
       const resData: PedidoResponse = await response.json();
       vaciar();
-      onSuccess(resData); 
+      
+      // En lugar de cerrar el modal de inmediato, guardamos los datos para mostrar el ticket
+      setPedidoConfirmado(resData); 
 
     } catch (err: any) {
       setError(err.message);
@@ -62,6 +67,17 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     }
   };
 
+  // INTERCEPTOR DE VISTA: Si ya hay un pedido confirmado, mostramos el TicketSuccess
+  if (pedidoConfirmado) {
+    return (
+      <TicketSuccess 
+        pedido={pedidoConfirmado} 
+        onCerrar={() => onSuccess(pedidoConfirmado)} // Cierra el cajón lateral/modal al darle a "Volver"
+      />
+    );
+  }
+
+  // Si no hay pedido confirmado, mostramos el formulario normal
   return (
     <form className="checkout-form" onSubmit={handleSubmit}>
       <h3>Datos de Retiro</h3>
@@ -95,7 +111,6 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
         <label>Franja Horaria de Retiro</label>
         <select value={franjaHoraria} onChange={(e) => setFranjaHoraria(e.target.value)} required>
           <option value="" disabled>Seleccioná un horario disponible</option>
-          {/* Horarios alineados con Comercio.java del backend */}
           <option value="10:00 - 11:00">Mañana (10:00 - 11:00)</option>
           <option value="11:00 - 12:00">Mediodía (11:00 - 12:00)</option>
           <option value="17:00 - 18:00">Tarde (17:00 - 18:00)</option>
