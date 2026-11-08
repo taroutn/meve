@@ -223,28 +223,17 @@ public class PedidoService {
     }
 
     public Pedido confirmarPagoIdempotente(String pedidoIdOCodigo, String paymentId) {
-        Pedido pedido = pedidoRepository.findById(pedidoIdOCodigo)
+        Pedido pedidoActual = pedidoRepository.findById(pedidoIdOCodigo)
                 .or(() -> pedidoRepository.findByCodigoTicket(pedidoIdOCodigo))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado: " + pedidoIdOCodigo));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
 
-        // Si ya fue confirmado o retirado antes, retornamos el pedido tal cual sin fallar
-        if (pedido.getEstado() == EstadoPedido.PAGADO_CONFIRMADO || pedido.getEstado() == EstadoPedido.RETIRADO) {
-            return pedido;
+        if (pedidoActual.getEstado() == EstadoPedido.PAGADO_CONFIRMADO || pedidoActual.getEstado() == EstadoPedido.RETIRADO) {
+            return pedidoActual; 
         }
 
-        // Validar que no esté expirado o cancelado
-        if (pedido.getEstado() == EstadoPedido.EXPIRADO || pedido.getEstado() == EstadoPedido.CANCELADO) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "No se puede confirmar el pago de un pedido en estado " + pedido.getEstado()
-            );
-        }
+        Pedido actualizado = cambiarEstado(pedidoActual, EstadoPedido.PAGADO_CONFIRMADO);
 
-        // Transición válida de PENDIENTE_PAGO -> PAGADO_CONFIRMADO
-        pedido.setEstado(EstadoPedido.PAGADO_CONFIRMADO);
-        pedido.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-" + System.currentTimeMillis());
-        pedido.setUpdatedAt(LocalDateTime.now());
-
-        return pedidoRepository.save(pedido);
+        actualizado.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-SIM");
+        return pedidoRepository.save(actualizado);
     }
 }
