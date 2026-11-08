@@ -119,7 +119,7 @@ public class ProductoService {
                     p.getNombre(),
                     p.getPrecio(),
                     p.getComercioId(),
-                    comercio.getId(),
+                    comercio.getNombre(),
                     p.getCategoria()
                 ));
             }
