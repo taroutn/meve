@@ -27,6 +27,9 @@ public class Pedido {
 
     private EstadoPedido estado = EstadoPedido.PENDIENTE_PAGO;
     private String whatsappUrl;
+    private String preferenceId;
+    private String sandboxInitPoint;
+    private String paymentId;
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();

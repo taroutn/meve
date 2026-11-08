@@ -123,6 +123,12 @@ public class PedidoService {
 
         pedido.setWhatsappUrl(generarWhatsappUrl(comercio, pedido));
 
+        String prefId = "PREF-SBX-" + pedido.getCodigoTicket();
+        pedido.setPreferenceId(prefId);
+        pedido.setSandboxInitPoint(
+            "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + prefId
+        );
+
         return pedidoRepository.save(pedido);
     }
 
@@ -214,5 +220,20 @@ public class PedidoService {
 
         String textoCodificado = URLEncoder.encode(mensaje.toString(), StandardCharsets.UTF_8);
         return "https://wa.me/" + telefono + "?text=" + textoCodificado;
+    }
+
+    public Pedido confirmarPagoIdempotente(String pedidoIdOCodigo, String paymentId) {
+        Pedido pedidoActual = pedidoRepository.findById(pedidoIdOCodigo)
+                .or(() -> pedidoRepository.findByCodigoTicket(pedidoIdOCodigo))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
+        if (pedidoActual.getEstado() == EstadoPedido.PAGADO_CONFIRMADO || pedidoActual.getEstado() == EstadoPedido.RETIRADO) {
+            return pedidoActual; 
+        }
+
+        Pedido actualizado = cambiarEstado(pedidoActual, EstadoPedido.PAGADO_CONFIRMADO);
+
+        actualizado.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-SIM");
+        return pedidoRepository.save(actualizado);
     }
 }
