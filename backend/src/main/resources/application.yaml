@@ -1,3 +1,8 @@
+server:
+  # Render y Railway avisan en qué puerto escuchar con la variable PORT.
+  # En local no existe, así que queda 8080 (o lo que pongas en SERVER_PORT).
+  port: ${PORT:8080}
+
 spring:
   web:
     error:
