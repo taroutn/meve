@@ -1,119 +1,111 @@
 import { useState, useEffect } from 'react';
-import ProductCard from '../components/ProductCard';
-import './Home.css'; // O el CSS que uses
+import ProductoCard from '../components/ProductCard';
+import type { Product } from '../types/product';
+import './Home.css';
+
+// Usar variable de entorno para despliegue
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function Home() {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Estados de filtros
-  const [q, setQ] = useState('');
-  const [categoria, setCategoria] = useState('');
-  const [radio, setRadio] = useState('todos');
+  const [error, setError] = useState<string | null>(null);
   
-  // Coordenadas
-  const [lat, setLat] = useState<number | null>(null);
-  const [lng, setLng] = useState<number | null>(null);
+  // Filtros
+  const [busqueda, setBusqueda] = useState('');
+  const [categoriaFiltro, setCategoriaFiltro] = useState('');
+  const [radioFiltro, setRadioFiltro] = useState('');
 
-  // 1. Obtener ubicación al cargar
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLat(position.coords.latitude);
-          setLng(position.coords.longitude);
-        },
-        (error) => {
-          console.warn("Geolocalización denegada o falló. Usando fallback de Jujuy.", error);
-          // Fallback a San Salvador de Jujuy / Palpalá
-          setLat(-24.1858);
-          setLng(-65.2995);
-        }
-      );
-    } else {
-      setLat(-24.1858);
-      setLng(-65.2995);
-    }
-  }, []);
-
-  // 2. Buscar productos cuando cambian los filtros o la ubicación
-  useEffect(() => {
-    // Evitamos buscar si todavía no tenemos las coordenadas iniciales
-    if (lat === null || lng === null) return;
-
     const fetchProductos = async () => {
-      setLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (q) params.append('q', q);
-        if (categoria) params.append('categoria', categoria);
+        setLoading(true);
+        setError(null);
         
-        // Si el radio no es "todos", enviamos lat, lng y el radio
-        if (radio !== 'todos') {
-          params.append('lat', lat.toString());
-          params.append('lng', lng.toString());
-          params.append('radioKm', radio);
+        // Ajustar endpoint a la variable de entorno
+        const response = await fetch(`${API_URL}/api/productos`);
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar los productos. Verifica tu conexión.');
         }
-
-        const response = await fetch(`http://localhost:8080/api/productos?${params.toString()}`);
-        if (response.ok) {
-          const data = await response.json();
-          setProductos(data);
-        }
-      } catch (error) {
-        console.error("Error al buscar productos:", error);
+        
+        const data = await response.json();
+        setProductos(data);
+      } catch (err: any) {
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProductos();
-  }, [q, categoria, radio, lat, lng]);
+  }, []);
+
+  // Extraer categorías únicas dinámicamente de los productos cargados
+  const categoriasUnicas = Array.from(new Set(productos.map(p => p.categoria).filter(Boolean)));
+
+  // Aplicar filtros en el frontend
+  const productosFiltrados = productos.filter(p => {
+    const matchBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
+    const matchCategoria = categoriaFiltro ? p.categoria === categoriaFiltro : true;
+    return matchBusqueda && matchCategoria;
+  });
 
   return (
     <div className="home-container">
       <header className="home-header">
-        <h1>Exploración Hiperlocal</h1>
+        <h2>Exploración Hiperlocal</h2>
         <p>Descubrí los mejores productos de los comercios cercanos en un solo lugar.</p>
       </header>
 
-      {/* Barra de Filtros (RF-14, RF-15, RF-16) */}
       <div className="filtros-container">
         <input 
           type="text" 
           placeholder="Buscar productos por nombre..." 
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="search-input"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
         />
         
-        <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className="filter-select">
+        {/* Selector de categorías dinámico */}
+        <select value={categoriaFiltro} onChange={(e) => setCategoriaFiltro(e.target.value)}>
           <option value="">Todas las categorías</option>
-          <option value="comida rápida">Comida Rápida</option>
-          <option value="panadería">Panadería</option>
-          <option value="kiosco">Kiosco</option>
-          <option value="saludable">Saludable</option>
+          {categoriasUnicas.map(cat => (
+            <option key={cat as string} value={cat as string}>{cat}</option>
+          ))}
         </select>
 
-        <select value={radio} onChange={(e) => setRadio(e.target.value)} className="filter-select">
-          <option value="1">Radio: 1 km</option>
-          <option value="3">Radio: 3 km</option>
-          <option value="5">Radio: 5 km</option>
-          <option value="todos">Todos (Sin límite)</option>
+        <select value={radioFiltro} onChange={(e) => setRadioFiltro(e.target.value)}>
+          <option value="">Todos (Sin límite)</option>
+          <option value="1">A menos de 1 km</option>
+          <option value="3">A menos de 3 km</option>
+          <option value="5">A menos de 5 km</option>
         </select>
       </div>
 
+      {/* Manejo de estados (Error, Loading, Empty, Grid) */}
       {loading ? (
-        <p className="loading-text">Buscando productos cercanos...</p>
+        <div className="loading-state">Cargando productos...</div>
+      ) : error ? (
+        <div className="error-state-container">
+          <span className="error-icon">🔌</span>
+          <h3>Error de conexión</h3>
+          <p>No pudimos conectar con el servidor para cargar los productos.</p>
+          
+          <button type="button" className="btn-retry" onClick={() => window.location.reload()}>
+            Reintentar conexión
+          </button>
+          
+          <small className="error-technical">{error}</small>
+        </div>
+      ) : productosFiltrados.length === 0 ? (
+        <div className="empty-state" style={{ textAlign: 'center', padding: '2rem', color: '#a0a0a0' }}>
+          No se encontraron productos en tu zona.
+        </div>
       ) : (
         <div className="productos-grid">
-          {productos.length > 0 ? (
-            productos.map((prod: any) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))
-          ) : (
-            <p className="no-results">No se encontraron productos en tu zona con esos filtros.</p>
-          )}
+          {productosFiltrados.map(producto => (
+            <ProductoCard key={producto.id} product={producto} />
+          ))}
         </div>
       )}
     </div>

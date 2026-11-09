@@ -2,18 +2,18 @@ import type { PedidoResponse } from '../types/pedido';
 import './CheckoutForm.css';
 
 interface TicketSuccessProps {
-  pedido?: PedidoResponse; // Make the prop optional
+  pedido?: PedidoResponse;
   onCerrar: () => void;
 }
 
 export default function TicketSuccess({ pedido, onCerrar }: TicketSuccessProps) {
-  // Add a check to return a loading or fallback state if 'pedido' is undefined
   if (!pedido) {
     return (
       <div className="ticket-success-container loading-state">
         <div className="spinner"></div>
         <p>Generando tu ticket de retiro y link de pago...</p>
-        <button onClick={onCerrar} className="btn-cerrar">Volver</button>
+        {/* Cambiamos btn-cerrar por btn-cancel para usar el estilo adaptativo */}
+        <button onClick={onCerrar} className="btn-cancel">Volver</button>
       </div>
     );
   }
@@ -32,18 +32,25 @@ export default function TicketSuccess({ pedido, onCerrar }: TicketSuccessProps) 
         Presentá este código en el mostrador del comercio en la franja horaria seleccionada.
       </p>
 
-      <div className="ticket-actions">
-        {/* RF-24: Botón de Pago Sandbox */}
-        {pedido.sandboxInitPoint && (
-          <a 
-            href={pedido.sandboxInitPoint} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="btn-mercadopago"
-          >
-            Pagar con MercadoPago (Sandbox)
-          </a>
-        )}
+      {/* Agregamos flexbox en columna para apilar los botones perfectamente */}
+      <div className="ticket-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1.5rem' }}>
+        
+        {/* Cambiamos el fondo #2a2a2a por transparent para que se adapte al modo claro/oscuro */}
+        <div 
+          className="simulated-payment-badge" 
+          style={{ 
+            backgroundColor: 'transparent', 
+            border: '1px dashed #009ee3', 
+            color: '#009ee3', 
+            padding: '0.85rem', 
+            borderRadius: '8px', 
+            textAlign: 'center', 
+            fontWeight: 'bold',
+            marginBottom: '0.5rem'
+          }}
+        >
+          Pago simulado: El comercio confirma el pago.
+        </div>
 
         {pedido.whatsappUrl && (
           <a 
@@ -56,7 +63,8 @@ export default function TicketSuccess({ pedido, onCerrar }: TicketSuccessProps) 
           </a>
         )}
 
-        <button onClick={onCerrar} className="btn-cerrar">
+        {/* Cambiamos btn-cerrar por btn-cancel para heredar el estilo y que se vea en todos los modos */}
+        <button onClick={onCerrar} className="btn-cancel">
           Volver al Inicio
         </button>
       </div>

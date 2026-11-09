@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useCarrito } from '../hooks/useCarrito';
 import type { PedidoRequest, PedidoResponse } from '../types/pedido';
-import TicketSuccess from './TicketSuccess'; // Importamos el componente del ticket
+import TicketSuccess from './TicketSuccess';
 import './CheckoutForm.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 interface CheckoutFormProps {
   onSuccess: (res: PedidoResponse) => void;
@@ -14,7 +16,6 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // NUEVO ESTADO: Guarda los datos devueltos por el backend
   const [pedidoConfirmado, setPedidoConfirmado] = useState<PedidoResponse | undefined>(undefined);
 
   const [nombre, setNombre] = useState('');
@@ -43,7 +44,7 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/pedidos', {
+      const response = await fetch(`${API_URL}/api/pedidos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedidoData),
@@ -57,7 +58,6 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
       const resData: PedidoResponse = await response.json();
       vaciar();
       
-      // En lugar de cerrar el modal de inmediato, guardamos los datos para mostrar el ticket
       setPedidoConfirmado(resData); 
 
     } catch (err: any) {
@@ -67,17 +67,15 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     }
   };
 
-  // INTERCEPTOR DE VISTA: Si ya hay un pedido confirmado, mostramos el TicketSuccess
   if (pedidoConfirmado) {
     return (
       <TicketSuccess 
         pedido={pedidoConfirmado} 
-        onCerrar={() => onSuccess(pedidoConfirmado)} // Cierra el cajón lateral/modal al darle a "Volver"
+        onCerrar={() => onSuccess(pedidoConfirmado)}
       />
     );
   }
 
-  // Si no hay pedido confirmado, mostramos el formulario normal
   return (
     <form className="checkout-form" onSubmit={handleSubmit}>
       <h3>Datos de Retiro</h3>
