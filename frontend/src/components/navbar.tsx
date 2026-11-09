@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import LogoMeve from './LogoMeve';
 import { useCarrito } from '../hooks/useCarrito';
-import './Navbar.css';
+import './navbar.css';
 
 interface NavbarProps {
   onOpenCart: () => void;
