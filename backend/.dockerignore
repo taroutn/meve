@@ -1,0 +1,7 @@
+# Lo que NO se manda a Docker al construir la imagen
+target/
+.env
+.vscode/
+.idea/
+*.iml
+HELP.md
