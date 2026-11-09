@@ -1,0 +1,6 @@
+spring:
+  web:
+    error:
+      # Incluye el texto del error (ej. "Pedido no encontrado") en las respuestas de error.
+      # Sin esto, el front recibe el código (404, 409...) pero no el motivo.
+      include-message: always
