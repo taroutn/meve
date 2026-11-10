@@ -46,7 +46,7 @@ public class SecurityConfig {
 
                 // 3. Rutas públicas (Guest): sin token
                 .requestMatchers("/error").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/pedidos", "/api/pedidos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/productos", "/api/comercios/**").permitAll()
 
