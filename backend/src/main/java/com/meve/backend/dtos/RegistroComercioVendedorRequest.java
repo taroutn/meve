@@ -25,12 +25,6 @@ public class RegistroComercioVendedorRequest {
     @NotBlank(message = "El nombre del comercio es obligatorio")
     private String nombreComercio;
 
-    @NotBlank(message = "El rubro o categoría es obligatorio")
-    private String rubro;
-
-    @NotBlank(message = "La dirección es obligatoria")
-    private String direccion;
-
     @NotBlank(message = "El WhatsApp de contacto es obligatorio")
     private String whatsapp;
 

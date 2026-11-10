@@ -80,7 +80,7 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un usuario registrado con ese email");
         }
 
-        // Crear el Comercio en estado PENDIENTE (inactivo para el catálogo público)
+        // Crear el Comercio en estado PENDIENTE
         Comercio nuevoComercio = new Comercio();
         nuevoComercio.setNombre(req.getNombreComercio().trim());
         nuevoComercio.setWhatsapp(req.getWhatsapp().trim());
