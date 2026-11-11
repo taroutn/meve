@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useCarrito } from '../hooks/useCarrito';
 import type { PedidoRequest, PedidoResponse } from '../types/pedido';
+import TicketSuccess from './TicketSuccess';
 import './CheckoutForm.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 interface CheckoutFormProps {
   onSuccess: (res: PedidoResponse) => void;
@@ -12,6 +15,8 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
   const { items, total, vaciar } = useCarrito();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const [pedidoConfirmado, setPedidoConfirmado] = useState<PedidoResponse | undefined>(undefined);
 
   const [nombre, setNombre] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -24,14 +29,13 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     setLoading(true);
     setError(null);
 
-    // Mapeamos los datos exactamente como los espera el backend de Lautaro
     const pedidoData: PedidoRequest = {
       comercioId: items[0].comercioId,
       compradorNombre: nombre,
       compradorTelefono: telefono,
       franjaHoraria,
       items: items.map(item => ({
-        productoId: item.id, // Traducimos 'id' a 'productoId'
+        productoId: item.id,
         cantidad: item.cantidad,
         precio: item.precio,
         nombre: item.nombre
@@ -40,7 +44,7 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/pedidos', {
+      const response = await fetch(`${API_URL}/api/pedidos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pedidoData),
@@ -53,7 +57,8 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
 
       const resData: PedidoResponse = await response.json();
       vaciar();
-      onSuccess(resData); 
+      
+      setPedidoConfirmado(resData); 
 
     } catch (err: any) {
       setError(err.message);
@@ -61,6 +66,15 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
       setLoading(false);
     }
   };
+
+  if (pedidoConfirmado) {
+    return (
+      <TicketSuccess 
+        pedido={pedidoConfirmado} 
+        onCerrar={() => onSuccess(pedidoConfirmado)}
+      />
+    );
+  }
 
   return (
     <form className="checkout-form" onSubmit={handleSubmit}>
@@ -95,7 +109,6 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
         <label>Franja Horaria de Retiro</label>
         <select value={franjaHoraria} onChange={(e) => setFranjaHoraria(e.target.value)} required>
           <option value="" disabled>Seleccioná un horario disponible</option>
-          {/* Horarios alineados con Comercio.java del backend */}
           <option value="10:00 - 11:00">Mañana (10:00 - 11:00)</option>
           <option value="11:00 - 12:00">Mediodía (11:00 - 12:00)</option>
           <option value="17:00 - 18:00">Tarde (17:00 - 18:00)</option>

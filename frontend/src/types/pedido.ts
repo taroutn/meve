@@ -19,4 +19,6 @@ export interface PedidoResponse {
   codigoTicket: string;
   estado: string; 
   whatsappUrl: string;
+  preferenceId?: string; // Nuevo
+  sandboxInitPoint?: string; // Nuevo
 }
