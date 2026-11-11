@@ -1,0 +1,139 @@
+/* ==========================================
+   LOGIN STYLES (Adaptable a todos los modos)
+   ========================================== */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  color: var(--color-text-main, #333);
+  padding: 1rem;
+}
+
+.login-card {
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #ddd);
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-card h2 {
+  color: var(--color-text-main, #111);
+  margin-bottom: 0.5rem;
+}
+
+.login-card p {
+  color: var(--color-text-muted, #666);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--color-text-main, #333);
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #ccc);
+  background-color: var(--color-input-bg, #f9f9f9);
+  color: var(--color-text-main, #111);
+  font-size: 1rem;
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-muted, #888);
+}
+
+.btn-login {
+  background-color: var(--color-primary, #2e7d32);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: opacity 0.2s;
+  margin-top: 0.5rem;
+}
+
+.btn-login:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-login:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+/* === MODO OSCURO === */
+body.dark-mode .login-card {
+  background-color: #1e1e1e !important;
+  border-color: #444 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .login-card h2,
+body.dark-mode .login-card p,
+body.dark-mode .form-group label {
+  color: #ffffff !important;
+}
+
+body.dark-mode .form-group input {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .form-group input::placeholder {
+  color: #888 !important;
+}
+
+/* === ALTO CONTRASTE === */
+body.high-contrast .login-card {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+body.high-contrast .login-card h2,
+body.high-contrast .login-card p,
+body.high-contrast .form-group label {
+  color: #ffff00 !important;
+}
+
+body.high-contrast .form-group input {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-login {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-login:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}

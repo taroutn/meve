@@ -1,0 +1,242 @@
+/* ==========================================
+   PANEL VENDEDOR STYLES (Unificado y Adaptable)
+   ========================================== */
+
+.panel-vendedor {
+  padding: 2rem;
+  color: var(--color-text-main, #333);
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  background-color: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.tab-btn.active, 
+.tab-btn:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.input-busqueda-ticket {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  color: var(--color-text-main);
+  box-sizing: border-box;
+}
+
+/* Contenedor general de la tabla de pedidos */
+.tabla-pedidos-container {
+  overflow-x: auto;
+  background: var(--color-navbar-bg, #fff);
+  border: 1px solid var(--color-border, #ddd);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.tabla-pedidos {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabla-pedidos th, 
+.tabla-pedidos td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border, #eee);
+  color: var(--color-text-main, #111);
+}
+
+.btn-confirmar-retiro {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.btn-confirmar-retiro:hover {
+  opacity: 0.9;
+}
+
+.empty-state {
+  color: var(--color-text-muted, #666);
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Catálogo de Stock */
+.productos-stock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-stock-card {
+  background: var(--color-navbar-bg, #fff);
+  border: 1px solid #ddd;
+  padding: 1.25rem;
+  border-radius: 8px;
+  color: var(--color-text-main);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.stock-controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stock-controls input {
+  width: 70px;
+  padding: 0.3rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.btn-toggle-activo.activo {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-toggle-activo.pausado {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* ==========================================
+   MODO OSCURO (Dark Mode)
+   ========================================== */
+
+body.dark-mode .panel-vendedor {
+  color: #ffffff !important;
+}
+
+body.dark-mode .tab-btn {
+  background-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .tab-btn.active, 
+body.dark-mode .tab-btn:hover {
+  background-color: #5a7d65 !important;
+  color: #ffffff !important;
+  border-color: #8fb99a !important;
+}
+
+body.dark-mode .input-busqueda-ticket {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  border-color: #444 !important;
+}
+
+body.dark-mode .tabla-pedidos-container,
+body.dark-mode .product-stock-card {
+  background-color: #1e1e1e !important;
+  border-color: #444 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .tabla-pedidos th, 
+body.dark-mode .tabla-pedidos td {
+  color: #ffffff !important;
+  border-bottom-color: #333 !important;
+}
+
+body.dark-mode .empty-state {
+  color: #aaa !important;
+}
+
+
+/* ==========================================
+   ALTO CONTRASTE (High Contrast)
+   ========================================== */
+
+body.high-contrast .panel-tabs {
+  background-color: #000000 !important;
+  border-bottom: 2px solid #ffff00 !important;
+  padding-bottom: 1rem;
+}
+
+body.high-contrast .tab-btn {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .tab-btn.active, 
+body.high-contrast .tab-btn:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+  border-color: #ffff00 !important;
+  text-decoration: underline;
+}
+
+body.high-contrast .input-busqueda-ticket {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .tabla-pedidos-container,
+body.high-contrast .product-stock-card {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+body.high-contrast .tabla-pedidos th, 
+body.high-contrast .tabla-pedidos td {
+  color: #ffff00 !important;
+  border-bottom: 1px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-confirmar-retiro {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-confirmar-retiro:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .empty-state {
+  color: #ffff00 !important;
+}

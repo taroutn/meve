@@ -1,0 +1,155 @@
+/* Panel SuperAdmin Styles */
+.panel-superadmin {
+  padding: 2rem;
+}
+
+.tabla-comercios-container {
+  overflow-x: auto;
+  background: var(--color-navbar-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+}
+
+.tabla-comercios {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tabla-comercios th, 
+.tabla-comercios td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  color: var(--color-text-main);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-aprobar {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.btn-aprobar:hover {
+  opacity: 0.9;
+}
+
+.btn-suspender {
+  background-color: #c62828;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.btn-suspender:hover {
+  opacity: 0.9;
+}
+
+.badge-comercio {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.badge-comercio.activo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge-comercio.suspendido {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.badge-comercio.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* === MODO OSCURO Y ALTO CONTRASTE: PANEL SUPERADMIN (COMERCIOS) === */
+
+body.dark-mode .tabla-comercios-container {
+  background-color: #1e1e1e !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .tabla-comercios th,
+body.dark-mode .tabla-comercios td {
+  border-bottom: 1px solid #333 !important;
+  color: #f1f1f1 !important;
+}
+
+body.dark-mode .tabla-comercios td strong {
+  color: #ffffff !important;
+}
+
+/* Alto Contraste para Tabla SuperAdmin */
+body.high-contrast .tabla-comercios-container {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .tabla-comercios th {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border-bottom: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .tabla-comercios td {
+  background-color: #000000 !important;
+  color: #00ffff !important;
+  border-bottom: 1px solid #ffff00 !important;
+}
+
+body.high-contrast .tabla-comercios td strong {
+  color: #ffff00 !important;
+}
+
+/* Badges y Botones de Moderación en Alto Contraste */
+body.high-contrast .badge-comercio.activo {
+  background-color: #000000 !important;
+  color: #00ff00 !important;
+  border: 2px solid #00ff00 !important;
+}
+
+body.high-contrast .badge-comercio.suspendido {
+  background-color: #000000 !important;
+  color: #ff5555 !important;
+  border: 2px solid #ff5555 !important;
+}
+
+body.high-contrast .badge-comercio.pendiente {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-aprobar,
+body.high-contrast .btn-suspender {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-aprobar:hover,
+body.high-contrast .btn-suspender:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
