@@ -17,10 +17,8 @@ export default function App() {
   return (
     <CarritoProvider>
       <BrowserRouter>
-        {/* Le pasamos la función al Navbar para que el botón abra el carrito de develop */}
         <Navbar onOpenCart={() => setIsCartOpen(true)} />
         
-        {/* Renderizamos el panel del carrito unificado */}
         <CarritoDrawer isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
 
         <Routes>

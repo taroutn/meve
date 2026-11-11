@@ -185,7 +185,7 @@ export default function PanelVendedor() {
                     <th>Franja Horaria</th>
                     <th>Total</th>
                     <th>Estado</th>
-                    <th>Acción Rápida (≤ 3 Clics)</th>
+                    <th>Acción Rápida</th>
                   </tr>
                 </thead>
                 <tbody>

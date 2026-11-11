@@ -64,12 +64,10 @@ export default function Navbar({ onOpenCart }: NavbarProps) {
         <Link to="/">Inicio</Link>
         <Link to="/comercios">Comercios</Link>
         
-        {/* Botón del Carrito heredado de develop */}
         <button className="cart-toggle-btn" onClick={onOpenCart} type="button">
           🛒 <span className="cart-badge">{cantidadCarrito}</span>
         </button>
 
-        {/* Botones de Autenticación de tus cambios */}
         {!isAuthenticated ? (
           <button className="btn-login-nav" onClick={() => navigate('/login')}>
             Iniciar Sesión
