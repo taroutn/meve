@@ -7,7 +7,7 @@ export default function AccessibilityBar() {
   return (
     <div className="accessibility-bar" role="region" aria-label="Barra de Accesibilidad">
       <div className="accessibility-container">
-        <span className="accessibility-title">♿ Accesibilidad:</span>
+        <span className="accessibility-title">Accesibilidad:</span>
         
         <div className="accessibility-controls">
           <button 

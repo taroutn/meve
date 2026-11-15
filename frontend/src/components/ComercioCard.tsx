@@ -13,7 +13,6 @@ export default function ComercioCard({ comercio }: ComercioCardProps) {
   const fallbackImage = 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?auto=format&fit=crop&q=80&w=500';
 
   const handleClick = () => {
-    // Navegación hacia la ruta del catálogo del comercio
     navigate(`/comercios/${comercio.id}`);
   };
 
