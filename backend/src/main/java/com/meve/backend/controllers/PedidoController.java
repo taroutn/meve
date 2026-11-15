@@ -40,6 +40,8 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.retirar(id, request.getCodigoTicket(), UsuarioActual.comercioId(jwt)));
     }
 
+    // Webhook de Mercado Pago SIMULADO (TFI): no valida la firma x-signature de MP.
+    // Cualquiera que conozca el id del pedido o el código del ticket puede marcarlo como pagado.
     @PostMapping("/webhook")
     public ResponseEntity<Pedido> recibirWebhookMercadoPago(
             @RequestParam(name = "pedidoId") String pedidoId,
