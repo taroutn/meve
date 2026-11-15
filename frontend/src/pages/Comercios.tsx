@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner';
 import type { Comercio } from '../types/comercio';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+let url = `${API_URL}/api/comercios`;
 
 export default function Comercios() {
   const [comercios, setComercios] = useState<Comercio[]>([]);
@@ -11,7 +12,7 @@ export default function Comercios() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/comercios`)
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error('Error al obtener los comercios.');
         return res.json();
