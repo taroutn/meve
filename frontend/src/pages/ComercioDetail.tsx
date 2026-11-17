@@ -8,19 +8,22 @@ import './ComercioDetail.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+
 export default function ComercioDetail() {
   const { id } = useParams<{ id: string }>();
   const [comercio, setComercio] = useState<Comercio | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const resComercio = fetch(`${API_URL}/api/comercios/${id}`);
+  const resProductos = fetch(`${API_URL}/api/comercios/${id}/productos?page=0&size=50`);
 
   useEffect(() => {
     if (!id) return;
 
     Promise.all([
       // Intento 1: GET /api/comercios/{id}
-      fetch(`${API_URL}/api/comercios/${id}`)
+      resComercio
         .then((res) => {
           if (!res.ok) throw new Error('fallback-comercio');
           return res.json();
@@ -35,7 +38,7 @@ export default function ComercioDetail() {
         }),
 
       // Intento 2: GET /api/comercios/{id}/productos
-      fetch(`${API_URL}/api/comercios/${id}/productos`)
+      resProductos
         .then((res) => {
           if (!res.ok) throw new Error('fallback-productos');
           return res.json();
