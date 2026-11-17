@@ -34,7 +34,7 @@ public class Pedido {
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
-        
+
     // Trazabilidad (RNF-11): momento exacto de cada transición. Quedan en null
     // mientras el pedido no pase por ese estado.
     private Instant pagadoEn;

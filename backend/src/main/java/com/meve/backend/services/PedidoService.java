@@ -168,7 +168,7 @@ public class PedidoService {
         return cambiarEstado(pedido, EstadoPedido.PAGADO_CONFIRMADO, EstadoPedido.RETIRADO);
     }
 
-        // Cancelación explícita (RF-23): solo mientras el pedido espera el pago.
+    // Cancelación explícita (RF-23): solo mientras el pedido espera el pago.
     // Se pide el código del ticket además del id, para que no alcance con adivinar un id.
     public Pedido cancelar(String pedidoId, String codigoTicket) {
         Pedido pedido = pedidoRepository.findById(pedidoId)

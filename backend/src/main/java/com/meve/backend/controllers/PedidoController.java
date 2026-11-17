@@ -45,7 +45,7 @@ public class PedidoController {
     // Exige el código del ticket y solo cancela pedidos en PENDIENTE_PAGO.
     @PostMapping("/{id}/cancelar")
     public ResponseEntity<Pedido> cancelar(@PathVariable String id,
-                                            @Valid @RequestBody CancelacionRequest request) {
+        @Valid @RequestBody CancelacionRequest request) {
         return ResponseEntity.ok(pedidoService.cancelar(id, request.getCodigoTicket()));
     }
 
