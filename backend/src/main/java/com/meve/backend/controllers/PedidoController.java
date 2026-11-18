@@ -1,5 +1,6 @@
 package com.meve.backend.controllers;
 
+import com.meve.backend.dtos.CancelacionRequest;
 import com.meve.backend.dtos.PedidoRequest;
 import com.meve.backend.dtos.RetiroRequest;
 import com.meve.backend.models.Pedido;
@@ -38,6 +39,14 @@ public class PedidoController {
                                             @Valid @RequestBody RetiroRequest request,
                                             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(pedidoService.retirar(id, request.getCodigoTicket(), UsuarioActual.comercioId(jwt)));
+    }
+
+    // Público: lo puede usar el comprador desde el ticket o el vendedor desde su panel.
+    // Exige el código del ticket y solo cancela pedidos en PENDIENTE_PAGO.
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<Pedido> cancelar(@PathVariable String id,
+        @Valid @RequestBody CancelacionRequest request) {
+        return ResponseEntity.ok(pedidoService.cancelar(id, request.getCodigoTicket()));
     }
 
     // Webhook de Mercado Pago SIMULADO (TFI): no valida la firma x-signature de MP.

@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,4 +34,11 @@ public class Pedido {
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // Trazabilidad (RNF-11): momento exacto de cada transición. Quedan en null
+    // mientras el pedido no pase por ese estado.
+    private Instant pagadoEn;
+    private Instant retiradoEn;
+    private Instant expiradoEn;
+    private Instant canceladoEn;
 }
