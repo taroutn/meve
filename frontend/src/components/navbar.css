@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 5%;
+  padding: 0.6rem 5%;
   background-color: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: sticky;
@@ -16,6 +16,16 @@
   color: #5a7d65;
   text-decoration: none;
   letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo-img {
+  height: 72px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: filter 0.2s ease;
 }
 
 .navbar-links {
@@ -124,6 +134,10 @@ body.dark-mode .navbar {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
+body.dark-mode .navbar-logo-img {
+  filter: brightness(2.2) saturate(0.9);
+}
+
 body.dark-mode .navbar-links a {
   color: #e0e0e0 !important;
 }
@@ -149,6 +163,10 @@ body.dark-mode .cart-toggle-btn:hover {
 body.high-contrast .navbar {
   background-color: #000000 !important;
   border-bottom: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .navbar-logo-img {
+  filter: brightness(0) saturate(100%) invert(89%) sepia(98%) saturate(1352%) hue-rotate(358deg) brightness(105%) contrast(104%);
 }
 
 body.high-contrast .navbar-logo a,
