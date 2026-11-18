@@ -45,7 +45,8 @@ export default function Login() {
       const data = await res.json();
       console.log("Respuesta completa del login:", data);
 
-      const token = data.token;
+      // El backend responde accessToken desde el PR #48; token queda por compatibilidad
+      const token = data.accessToken ?? data.token;
       if (!token) throw new Error('No se recibió un token válido.');
 
       // Guardamos el token en localStorage
