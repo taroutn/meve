@@ -16,6 +16,11 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     }
 
     @Override
+    protected boolean autoIndexCreation() {
+        return true;
+    }
+
+    @Override
     public MongoClient mongoClient() {
         // Leemos la variable directamente del sistema operativo, esquivando application.properties
         String mongoUri = System.getenv("MONGO_URI");

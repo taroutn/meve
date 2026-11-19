@@ -2,311 +2,47 @@
   "info": {
     "_postman_id": "583ca18c-15d9-456b-bcf0-7f72158331ea",
     "name": "MeVe MVP",
+    "description": "Todos los endpoints de la API de MeVe, agrupados por quién los usa.\n\nEnvironments: \"MeVe - Local\" (http://localhost:8080) o \"MeVe - Producción\" (https://meve.onrender.com). En los dos hay que cargar password_prueba (la clave de los usuarios @meve.test); no se versiona.\n\nOrden sugerido: 1. Auth (login) → 3. Crear pedido → 4/3 según el flujo (pago, retiro o cancelación). Local y producción usan la misma base de MongoDB Atlas, así que todo lo que escribe (pedidos, productos, comercios) queda en los datos de la demo.\n\nRender (plan gratis) se duerme sin uso: el primer request puede tardar alrededor de un minuto y medio.\n\nPara las pruebas automáticas de punta a punta está la colección \"MeVe E2E\".",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "55203970",
     "_collection_link": "https://go.postman.co/collection/55203970-583ca18c-15d9-456b-bcf0-7f72158331ea?source=collection_link"
   },
   "item": [
     {
-      "name": "Comercios",
+      "name": "1. Auth",
+      "id": "c764bd94-f753-4668-a6a0-53334ea76765",
+      "description": "Login con los usuarios de prueba (@meve.test, clave en la variable de entorno password_prueba) y alta de comercio. El login guarda el JWT en el environment: token (vendedor) o token_admin (SuperAdmin).",
       "item": [
         {
-          "name": "Registrar comercio",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/comercios",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "comercios"
-              ]
-            },
-            "description": "Registra un nuevo comercio (tenant) en la plataforma.\n\n_**CAMPOS**_\n\nnombre obligatorio. Nombre comercial visible al publico.\n\nrubro obligatorio. Valores: ALMACEN, VERDULERIA, PANADERIA,  \nCARNICERIA, KIOSCO, FARMACIA, OTRO.\n\ndescripcion opcional. Maximo 300 caracteres.\n\nwhatsapp obligatorio. Formato E.164 sin espacios ni guiones.\n\nDe este numero se arma el link wa.me para cerrar el pedido.\n\ndireccion obligatorio. Objeto con calle, barrio, ciudad, provincia.\n\nubicacion opcional. lat y lng. Se usa para el motor de proximidad.\n\nhorarios opcional. Lista de tramos. Admite mas de un tramo por dia  \npara contemplar el cierre del mediodia.\n\nRESPUESTAS\n\n201 Comercio creado. Ver example \"201 - Comercio creado\".  \n400 Error de validacion. Ver example \"400 - Datos invalidos\".  \n401 Token ausente o invalido. Ver example \"401 - No autenticado\".\n\nNOTAS\n\nEl comercio se crea con estado PENDIENTE y activo en false. No aparece en  \nla vitrina publica hasta que un SuperAdmin lo aprueba.\n\nAUTENTICACION\n\nRequiere token JWT de cualquier usuario registrado. El backend extrae  \nel ID del dueno del token, no se envia en el body.  \nFlujo: POST /api/auth/register -> obtener token -> POST /api/comercios\n\nCAMPOS QUE NO SE ENVIAN\n\nslug lo genera el backend normalizando el nombre (minusculas,  \nguiones, sin caracteres especiales). Viene en el response  \nporque es la URL publica del comercio.  \nusuario sale del token JWT.\n\nFORMATO DE ERROR\n\nProblem Details, RFC 7807. Campos: type, title, status, detail, instance.\n\nPENDIENTE\n\nConfirmar si POST /api/auth/register devuelve el JWT directo o si hay  \nun POST /api/auth/login aparte. Segun eso se suma el endpoint a la  \ncoleccion con un script que guarde el token en el environment.\n\nConfirmar si se mantiene la moderacion del SuperAdmin (estado PENDIENTE,  \nactivo false) ahora que el alta requiere usuario autenticado, o si el  \ncomercio queda activo al crearse."
-          },
-          "response": [
-            {
-              "name": "201 - Comercio creado",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/api/comercios",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "comercios"
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [],
-              "body": "{\r\n  \"id\": \"665f1c2a9b3e4a0012ab34cd\",\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"slug\": \"almacen-dona-rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"estado\": \"PENDIENTE\",\r\n  \"activo\": false,\r\n  \"createdAt\": \"2026-09-08T20:15:30Z\"\r\n}"
-            },
-            {
-              "name": "400 - Datos invalidos",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/api/comercios",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "comercios"
-                  ]
-                }
-              },
-              "code": 400,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [],
-              "body": "{\r\n  \"type\": \"about:blank\",\r\n  \"title\": \"Bad Request\",\r\n  \"status\": 400,\r\n  \"detail\": \"El formato del campo whatsapp debe ser E.164, ej: +5493884123456\",\r\n  \"instance\": \"/api/comercios\"\r\n}"
-            },
-            {
-              "name": "401 - No autenticado",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "Bearer {{token}}",
-                    "type": "text"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Almacen Dona Rosa\",\r\n  \"rubro\": \"ALMACEN\",\r\n  \"descripcion\": \"Almacen de barrio con productos de primera necesidad.\",\r\n  \"whatsapp\": \"+5493884123456\",\r\n  \"direccion\": {\r\n    \"calle\": \"Av. Bolivia 1234\",\r\n    \"barrio\": \"Alto Comedero\",\r\n    \"ciudad\": \"San Salvador de Jujuy\",\r\n    \"provincia\": \"Jujuy\"\r\n  },\r\n  \"ubicacion\": {\r\n    \"lat\": -24.2345,\r\n    \"lng\": -65.2345\r\n  },\r\n  \"horarios\": [\r\n    { \"dia\": \"LUNES\", \"abre\": \"09:00\", \"cierra\": \"13:00\" },\r\n    { \"dia\": \"LUNES\", \"abre\": \"17:00\", \"cierra\": \"21:00\" }\r\n  ]\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/api/comercios",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "comercios"
-                  ]
-                }
-              },
-              "code": 401,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n    \"type\": \"about:blank\",\n    \"title\": \"Unauthorized\",\n    \"status\": 401,\n    \"detail\": \"Token JWT ausente o invalido\",\n    \"instance\": \"/api/comercios\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "Listar Comercios",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/comercios",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "comercios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Detalle Comercio",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/comercios/:id",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "comercios",
-                ":id"
-              ],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "651a2b3c4d5e6f7000000002"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Auth",
-      "item": [
-        {
-          "name": "Registrar usuario",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nombre\": \"Rosa Quispe\",\r\n  \"email\": \"rosa@ejemplo.com\",\r\n  \"password\": \"Password123!\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/auth/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "register"
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "201 - Usuario creado",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"nombre\": \"Rosa Quispe\",\r\n  \"email\": \"rosa@ejemplo.com\",\r\n  \"password\": \"Password123!\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/api/auth/register",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "auth",
-                    "register"
-                  ]
-                }
-              },
-              "code": 201,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [],
-              "body": "{\r\n  \"id\": \"665f1c2a9b3e4a0012ab9999\",\r\n  \"nombre\": \"Rosa Quispe\",\r\n  \"email\": \"rosa@ejemplo.com\",\r\n  \"createdAt\": \"2026-09-13T10:00:00Z\"\r\n}"
-            }
-          ]
-        },
-        {
-          "name": "Login",
+          "name": "Login vendedor (Burger)",
+          "id": "6fba38b5-8c9c-489e-8173-a3b1553f34f0",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 200) {\r\n    const data = pm.response.json();\r\n    pm.environment.set(\"token\", data.token);\r\n    console.log(\"Token guardado en el environment\");\r\n}"
+                  "pm.test(\"Login de Burger (200)\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Devuelve accessToken de tipo Bearer\", () => {",
+                  "        pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tokenType).to.eql(\"Bearer\");",
+                  "    });",
+                  "    pm.environment.set(\"token\", body.accessToken);",
+                  "}"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"email\": \"burger@meve.test\",\r\n  \"password\": \"{{password_prueba}}\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
-            },
+            ],
             "url": {
               "raw": "{{base_url}}/api/auth/login",
               "host": [
@@ -318,120 +54,288 @@
                 "login"
               ]
             },
-            "description": "Devuelve el JWT para autenticar las requests protegidas.\n\nEl script post-response guarda el token automaticamente en la variable  \n{{token}} del environment. No hace falta copiarlo a mano.\n\nFLUJO COMPLETO\n\n1. POST /api/auth/register -> crea el usuario, devuelve 201 sin token\n    \n2. POST /api/auth/login -> devuelve el JWT, el script lo guarda\n    \n3. POST /api/comercios -> usa {{token}} en el header Authorization\n    \n\nPENDIENTE  \nConfirmar con backend los nombres exactos de los campos de la respuesta  \ndel login. El script asume \"token\"; si Spring devuelve \"accessToken\" u  \notro nombre, se ajusta la linea del script."
-          },
-          "response": [
-            {
-              "name": "200 - Login exitoso",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\r\n  \"email\": \"rosa@ejemplo.com\",\r\n  \"password\": \"Password123!\"\r\n}",
-                  "options": {
-                    "raw": {
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{base_url}}/api/auth/login",
-                  "host": [
-                    "{{base_url}}"
-                  ],
-                  "path": [
-                    "api",
-                    "auth",
-                    "login"
-                  ]
-                }
-              },
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [],
-              "body": "{\r\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ejemplo.firma\",\r\n  \"tipo\": \"Bearer\",\r\n  \"expiraEn\": 86400\r\n}"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Productos",
-      "item": [
-        {
-          "name": "Catalogo Publico",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 200\", () => {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Devuelve una lista\", () => {\r\n    pm.expect(pm.response.json()).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Cada producto trae los datos de la ProductCard\", () => {\r\n    pm.response.json().forEach(p => {\r\n        pm.expect(p).to.have.all.keys(\"id\", \"nombre\", \"precio\", \"comercioId\", \"comercioNombre\", \"categoria\");\r\n        pm.expect(p.precio).to.be.a(\"number\");\r\n    });\r\n});"
-                ]
-              }
-            }
-          ],
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
+            "description": "Devuelve el JWT del vendedor de Burger Palpalá y lo guarda en {{token}}. Respuesta: accessToken, tokenType (Bearer), expiresIn (segundos), rol, comercioId, email. 401 si el email o la clave no coinciden.",
             "body": {
               "mode": "raw",
-              "raw": "",
+              "raw": "{\n  \"email\": \"burger@meve.test\",\n  \"password\": \"{{password_prueba}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "url": {
-              "raw": "{{base_url}}/api/productos",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "productos"
-              ]
+            "auth": {
+              "type": "noauth"
             }
           },
           "response": []
         },
         {
-          "name": "Crear Producto",
+          "name": "Login admin",
+          "id": "4cc1cc87-1d06-4271-96f6-d34bcb5f39f7",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login de admin (200)\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Devuelve accessToken de tipo Bearer\", () => {",
+                  "        pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tokenType).to.eql(\"Bearer\");",
+                  "    });",
+                  "    pm.environment.set(\"token_admin\", body.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
               ]
             },
-            "method": "POST",
-            "header": [],
+            "description": "JWT del SuperAdmin, se guarda en {{token_admin}}. Lo usan los requests de la carpeta SuperAdmin.",
             "body": {
               "mode": "raw",
-              "raw": "   {\r\n     \"nombre\": \"Coca-Cola 2.25L\",\r\n     \"precio\": 3500,\r\n     \"stock\": 20,\r\n     \"categoria\": \"Gaseosas\"\r\n   }",
+              "raw": "{\n  \"email\": \"admin@meve.test\",\n  \"password\": \"{{password_prueba}}\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registro de comercio y vendedor",
+          "id": "11fd871e-8a8c-46b4-91e4-1b5b4eb7847f",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Comercio registrado (201)\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda PENDIENTE\", () => pm.expect(body.estadoComercio).to.eql(\"PENDIENTE\"));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/registro-comercio",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "registro-comercio"
+              ]
+            },
+            "description": "Onboarding (tarjeta #39): crea el comercio en estado PENDIENTE (no aparece en la vitrina hasta que lo aprueba el SuperAdmin) y su usuario VENDEDOR. Escribe en la base: el email se genera con {{$timestamp}} para no repetirse y la clave es aleatoria; si después querés entrar con ese usuario, poné una clave tuya antes de enviarlo. Respuestas: 201 creado, 400 datos inválidos (clave de menos de 8 caracteres, email mal formado, faltan coordenadas), 409 email ya registrado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreVendedor\": \"Vendedor de prueba\",\n  \"email\": \"vendedor.{{$timestamp}}@meve.test\",\n  \"password\": \"{{$randomPassword}}\",\n  \"nombreComercio\": \"Almacén de prueba\",\n  \"whatsapp\": \"+5493884000000\",\n  \"latitud\": -24.2565,\n  \"longitud\": -65.2105\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Vitrina pública",
+      "id": "a65ce24e-e4de-4eca-b754-9332844d8816",
+      "description": "Endpoints sin token que usa el comprador. Solo muestran comercios ACTIVO y productos activos y no eliminados.",
+      "item": [
+        {
+          "name": "Listar comercios",
+          "id": "d8317fba-e3bd-485e-8eba-d560ec49538e",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Lista de comercios (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "-24.2565",
+                  "disabled": true
+                },
+                {
+                  "key": "lng",
+                  "value": "-65.2105",
+                  "disabled": true
+                },
+                {
+                  "key": "radioKm",
+                  "value": "5",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Comercios activos. Con lat y lng ordena por cercanía y filtra por radioKm (5 km si no se manda). Habilitá los parámetros para probar la búsqueda por proximidad.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle de comercio",
+          "id": "2502ff01-7335-418c-8f19-fb5c2ea9e846",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Detalle (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae las franjas de retiro\", () => pm.expect(pm.response.json().franjas).to.be.an(\"array\").that.is.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            },
+            "description": "Datos del comercio y sus franjas de retiro con cupos disponibles. 404 si no existe o no está ACTIVO.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Catálogo de un comercio",
+          "id": "799518ec-77f7-4b7d-a4ae-e063374ef666",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Catálogo del comercio (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "Productos publicados del comercio, con stock.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Catálogo público",
+          "id": "dd0ee84f-38d5-4432-afdf-47eac3c51944",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Catálogo (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"Cada producto trae los datos de la ProductCard\", () => {",
+                  "    pm.response.json().forEach(p => {",
+                  "        pm.expect(p).to.include.all.keys(\"id\", \"nombre\", \"precio\", \"comercioId\", \"comercioNombre\", \"categoria\");",
+                  "        pm.expect(p.precio).to.be.a(\"number\");",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/api/productos",
               "host": [
@@ -440,7 +344,43 @@
               "path": [
                 "api",
                 "productos"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "hamburguesa",
+                  "disabled": true
+                },
+                {
+                  "key": "categoria",
+                  "value": "Hamburguesas",
+                  "disabled": true
+                },
+                {
+                  "key": "disponible",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "lat",
+                  "value": "-24.2565",
+                  "disabled": true
+                },
+                {
+                  "key": "lng",
+                  "value": "-65.2105",
+                  "disabled": true
+                },
+                {
+                  "key": "radioKm",
+                  "value": "5",
+                  "disabled": true
+                }
               ]
+            },
+            "description": "Productos de todos los comercios activos. Filtros opcionales: q (texto), categoria, disponible=true (solo con stock), lat/lng/radioKm.",
+            "auth": {
+              "type": "noauth"
             }
           },
           "response": []
@@ -448,33 +388,38 @@
       ]
     },
     {
-      "name": "Pedidos",
+      "name": "3. Compra Click & Collect",
+      "id": "a0fa0f27-26fc-4e48-b816-977326fe05f2",
+      "description": "Flujo del comprador sin cuenta (guest). Crear pedido guarda pedidoId y codigoTicket en el environment; los demás requests de esta carpeta y de la del vendedor los usan.",
       "item": [
         {
-          "name": "Crear Pedido",
+          "name": "Crear pedido",
+          "id": "e25b9b88-2cfc-48ad-a318-0ee36c3f020e",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "if (pm.response.code === 201) {\r\n    const pedido = pm.response.json();\r\n    pm.environment.set(\"pedidoId\", pedido.id);\r\n    pm.environment.set(\"codigoTicket\", pedido.codigoTicket);\r\n    console.log(\"Pedido guardado: \" + pedido.codigoTicket);\r\n}"
+                  "pm.test(\"Pedido creado (201)\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const pedido = pm.response.json();",
+                  "    pm.test(\"Queda en PENDIENTE_PAGO\", () => pm.expect(pedido.estado).to.eql(\"PENDIENTE_PAGO\"));",
+                  "    pm.environment.set(\"pedidoId\", pedido.id);",
+                  "    pm.environment.set(\"codigoTicket\", pedido.codigoTicket);",
+                  "}"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"comercioId\": \"651a2b3c4d5e6f7000000002\",\r\n  \"compradorNombre\": \"Prueba QA\",\r\n  \"compradorTelefono\": \"3884000000\",\r\n  \"franjaHoraria\": \"17:00 - 18:00\",\r\n  \"items\": [\r\n    { \"productoId\": \"6acd7bc61511938f26fad51d\", \"cantidad\": 1 }\r\n  ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
-            },
+            ],
             "url": {
               "raw": "{{base_url}}/api/pedidos",
               "host": [
@@ -484,43 +429,169 @@
                 "api",
                 "pedidos"
               ]
+            },
+            "description": "Reserva stock y un cupo de la franja (bloqueo preventivo) y deja el pedido en PENDIENTE_PAGO con un ticket MEVE-XXXXXX y el link de WhatsApp. Si nadie paga, el job de expiración lo pasa a EXPIRADO y devuelve stock y cupo. 409 sin stock o franja sin cupo, 400 datos inválidos, 404 comercio o producto inexistente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comercioId\": \"{{comercioId}}\",\n  \"compradorNombre\": \"Prueba QA\",\n  \"compradorTelefono\": \"3884000000\",\n  \"franjaHoraria\": \"17:00 - 18:00\",\n  \"items\": [\n    {\n      \"productoId\": \"{{productoId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
             }
           },
           "response": []
         },
         {
-          "name": "Panel del Vendedor",
+          "name": "Simular pago aprobado (webhook)",
+          "id": "8dc7ed10-9294-4912-915e-ae2b3be9c74d",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago simulado (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda PAGADO_CONFIRMADO\", () => pm.expect(pm.response.json().estado).to.eql(\"PAGADO_CONFIRMADO\"));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/webhook?pedidoId={{pedidoId}}&data.id=pago-simulado-{{$timestamp}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "webhook"
+              ],
+              "query": [
                 {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
+                  "key": "pedidoId",
+                  "value": "{{pedidoId}}"
+                },
+                {
+                  "key": "data.id",
+                  "value": "pago-simulado-{{$timestamp}}"
                 }
               ]
             },
+            "description": "Webhook de Mercado Pago SIMULADO (no valida la firma de MP): pasa el pedido a PAGADO_CONFIRMADO. Es idempotente: si llega dos veces, la segunda no cambia nada. 404 si el pedido no existe, 409 si ya está expirado o cancelado.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar pedido",
+          "id": "cf302451-5f15-78b0-8c73-075186d8756c",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pedido cancelado (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda CANCELADO con su fecha\", () => {",
+                  "    const pedido = pm.response.json();",
+                  "    pm.expect(pedido.estado).to.eql(\"CANCELADO\");",
+                  "    pm.expect(pedido.canceladoEn).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedidoId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedidoId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Cancela un pedido en PENDIENTE_PAGO y devuelve el stock y el cupo de la franja (RF-23, tarjeta #44). Público: exige el código del ticket. Respuestas: 200 cancelado, 400 sin código o código que no coincide, 404 pedido inexistente, 409 si ya no estaba pendiente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{codigoTicket}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Vendedor",
+      "id": "48487316-11cb-4878-ad63-e02cb744e958",
+      "description": "Requieren el token de un VENDEDOR ({{token}}, lo guarda \"Login vendedor\"). Cada vendedor solo ve y modifica lo de su comercio: con el token de otro comercio responden 403 o 404.",
+      "item": [
+        {
+          "name": "Panel de pedidos del día",
+          "id": "8ac4c91b-9fa5-4cdf-8268-d6ea64bc5c86",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Panel (200)\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/comercios/651a2b3c4d5e6f7000000002/pedidos",
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/pedidos",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "comercios",
-                "651a2b3c4d5e6f7000000002",
+                "{{comercioId}}",
                 "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "PENDIENTE_PAGO",
+                  "disabled": true
+                }
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Confirmar Pago",
-          "request": {
+            },
+            "description": "Pedidos del día del comercio del token. Filtro opcional por estado: PENDIENTE_PAGO, PAGADO_CONFIRMADO, RETIRADO, EXPIRADO, CANCELADO.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -530,7 +601,25 @@
                   "type": "string"
                 }
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar pago (manual)",
+          "id": "23be6484-0e0a-4401-b38a-98e28ae1e390",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pago confirmado (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
             "method": "PATCH",
             "header": [],
             "url": {
@@ -544,13 +633,8 @@
                 "{{pedidoId}}",
                 "confirmar-pago"
               ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Retirar Pedido",
-          "request": {
+            },
+            "description": "El vendedor marca el pago como recibido. Solo desde PENDIENTE_PAGO; si no, 409.",
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -560,18 +644,32 @@
                   "type": "string"
                 }
               ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "   { \"codigoTicket\": \"{{codigoTicket}}\" }",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Retirar pedido",
+          "id": "3f8757d7-6d51-4448-871b-6e1e14ad3ec2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pedido retirado (200)\", () => pm.response.to.have.status(200));"
+                ]
               }
-            },
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/pedidos/{{pedidoId}}/retirar",
               "host": [
@@ -583,6 +681,500 @@
                 "{{pedidoId}}",
                 "retirar"
               ]
+            },
+            "description": "Entrega con el código del ticket. Solo desde PAGADO_CONFIRMADO (409 si no) y con el código correcto (400 si no coincide).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{codigoTicket}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis productos",
+          "id": "3d2656fc-0eed-4f17-8f86-34a34dd832ec",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Mis productos (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "Inventario del comercio del token, incluidos los pausados (no los eliminados).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear producto",
+          "id": "3dd28a96-e97a-4402-8731-a73c5cc8daec",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Producto creado (201)\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set(\"productoNuevoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "description": "El producto se crea en el comercio del token (el comercioId no se manda). Guarda el id en productoNuevoId para los requests que siguen.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 1500,\n  \"stock\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar producto",
+          "id": "0d25edc5-eec1-4ee1-94b8-e984f19d0aaf",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Producto editado (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoNuevoId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoNuevoId}}"
+              ]
+            },
+            "description": "Reemplaza nombre, categoría, precio y stock. 404 si es de otro comercio o está eliminado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba editado\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 1800,\n  \"stock\": 8\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pausar o reactivar producto",
+          "id": "09ef9066-ce52-4738-919f-c4483f835c54",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Publicación cambiada (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoNuevoId}}/publicacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoNuevoId}}",
+                "publicacion"
+              ]
+            },
+            "description": "activo=false lo saca del catálogo público sin borrarlo; activo=true lo vuelve a publicar.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar producto (baja lógica)",
+          "id": "50564d4d-27a1-4b8e-9f3b-3f39db6548cb",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Producto eliminado (204)\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoNuevoId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoNuevoId}}"
+              ]
+            },
+            "description": "Marca el producto como eliminado: desaparece del catálogo y de Mis productos. Responde 204 sin cuerpo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar mi comercio",
+          "id": "a46cb542-2673-4472-baa2-36e0bf757086",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Comercio actualizado (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            },
+            "description": "Horarios, franjas de retiro (rango y capacidad) y ubicación del comercio del token. Ojo: modifica el comercio real; el body de ejemplo deja Burger Palpalá como está cargado. 403 si el id no es el del token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"horarios\": \"Martes a Domingos de 19:00 a 00:00\",\n  \"franjas\": [\n    {\n      \"rango\": \"10:00 - 11:00\",\n      \"capacidadMaxima\": 3\n    },\n    {\n      \"rango\": \"11:00 - 12:00\",\n      \"capacidadMaxima\": 3\n    },\n    {\n      \"rango\": \"17:00 - 18:00\",\n      \"capacidadMaxima\": 3\n    },\n    {\n      \"rango\": \"18:00 - 19:00\",\n      \"capacidadMaxima\": 3\n    }\n  ],\n  \"lat\": -24.2562,\n  \"lng\": -65.2114\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. SuperAdmin",
+      "id": "099f3d8b-2875-4eb8-8b92-a24c7c44b964",
+      "description": "Requieren el token del SuperAdmin ({{token_admin}}, lo guarda \"Login admin\"). Con token de vendedor responden 403.",
+      "item": [
+        {
+          "name": "Listar todos los comercios",
+          "id": "34325930-169d-4775-afa6-ff1d21eca7d9",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Lista completa (200)\", () => pm.response.to.have.status(200));",
+                  "const porEstado = {};",
+                  "pm.response.json().forEach(c => porEstado[c.estado] = (porEstado[c.estado] || 0) + 1);",
+                  "console.log(\"Comercios por estado: \" + JSON.stringify(porEstado));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios"
+              ]
+            },
+            "description": "Todos los comercios, incluidos PENDIENTE y SUSPENDIDO. El test muestra en la consola cuántos hay en cada estado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar estado de comercio",
+          "id": "abef4e07-c84f-4a50-a010-1be80d9af98f",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Estado cambiado (200)\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioModeradoId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioModeradoId}}",
+                "estado"
+              ]
+            },
+            "description": "ACTIVO aprueba el comercio (aparece en la vitrina) y SUSPENDIDO lo oculta. Volver a PENDIENTE o un estado inexistente da 400. comercioModeradoId viene cargado con el \"Comercio de prueba moderacion\" que dejó una corrida de la E2E.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear comercio (admin)",
+          "id": "a6c66831-9a06-4e15-8e18-161785d21a62",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Comercio creado (201)\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ]
+            },
+            "description": "Alta directa de un comercio por el SuperAdmin. Nace PENDIENTE e inactivo; para la vitrina hay que aprobarlo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comercio creado por el admin\",\n  \"descripcion\": \"Alta manual\",\n  \"whatsapp\": \"+5493884000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
             }
           },
           "response": []
@@ -590,34 +1182,22 @@
       ]
     }
   ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "requests": {},
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
   "variable": [
     {
-      "key": "base_url",
+      "key": "comercioId",
+      "value": "651a2b3c4d5e6f7000000002"
+    },
+    {
+      "key": "productoId",
+      "value": "6acd7bc61511938f26fad51d"
+    },
+    {
+      "key": "productoNuevoId",
       "value": ""
+    },
+    {
+      "key": "comercioModeradoId",
+      "value": "6aefcc0aa950cfddc1fa9ac9"
     }
   ]
 }

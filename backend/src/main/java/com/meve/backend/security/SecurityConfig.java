@@ -1,5 +1,6 @@
 package com.meve.backend.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,11 +15,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // Orígenes permitidos por CORS. Se lee de la variable de entorno MEVE_CORS_ORIGINS
+    // (varias URLs separadas por coma). Si no está definida, queda solo el front local de Vite.
+    @Value("${meve.cors.origins:http://localhost:5173}")
+    private String[] origenesPermitidos;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,14 +41,20 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/confirmar-pago").hasRole("VENDEDOR")
                 .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/retirar").hasRole("VENDEDOR")
                 .requestMatchers(HttpMethod.POST, "/api/productos").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.GET, "/api/productos/mios").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/*").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PATCH, "/api/productos/*/publicacion").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/*").hasRole("VENDEDOR")
+                .requestMatchers(HttpMethod.PUT, "/api/comercios/*").hasRole("VENDEDOR")
 
                 // 2. Rutas del SUPERADMIN
                 .requestMatchers(HttpMethod.POST, "/api/comercios").hasRole("SUPERADMIN")
+                .requestMatchers("/api/admin/**").hasRole("SUPERADMIN")
 
                 // 3. Rutas públicas (Guest): sin token
                 .requestMatchers("/error").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/pedidos").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/pedidos", "/api/pedidos/webhook", "/api/pedidos/*/cancelar").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/productos", "/api/comercios/**").permitAll()
 
                 // 4. Cualquier otra cosa: con token válido
@@ -69,7 +82,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // frontend de Vite en desarrollo
+        config.setAllowedOrigins(Arrays.stream(origenesPermitidos).map(String::trim).toList());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
 

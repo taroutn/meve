@@ -6,6 +6,8 @@ import type { Comercio } from '../types/comercio';
 import type { Product } from '../types/product';
 import './ComercioDetail.css';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 export default function ComercioDetail() {
   const { id } = useParams<{ id: string }>();
   const [comercio, setComercio] = useState<Comercio | null>(null);
@@ -16,18 +18,15 @@ export default function ComercioDetail() {
   useEffect(() => {
     if (!id) return;
 
-    // Eliminamos las llamadas síncronas a setLoading(true) y setError(null) de aquí,
-    // ya que los estados ya inician con esos valores por defecto.
-
     Promise.all([
       // Intento 1: GET /api/comercios/{id}
-      fetch(`http://localhost:8080/api/comercios/${id}`)
+      fetch(`${API_URL}/api/comercios/${id}`)
         .then((res) => {
           if (!res.ok) throw new Error('fallback-comercio');
           return res.json();
         })
         .catch(async () => {
-          const resAll = await fetch('http://localhost:8080/api/comercios');
+          const resAll = await fetch(`${API_URL}/api/comercios`);
           if (!resAll.ok) throw new Error('No se pudo obtener la información del comercio.');
           const comercios: Comercio[] = await resAll.json();
           const encontrado = comercios.find((c) => c.id === id);
@@ -36,18 +35,18 @@ export default function ComercioDetail() {
         }),
 
       // Intento 2: GET /api/comercios/{id}/productos
-      fetch(`http://localhost:8080/api/comercios/${id}/productos`)
+      fetch(`${API_URL}/api/comercios/${id}/productos`)
         .then((res) => {
           if (!res.ok) throw new Error('fallback-productos');
           return res.json();
         })
         .catch(async () => {
-          const resProd = await fetch('http://localhost:8080/api/productos', {
+          const resProd = await fetch(`${API_URL}/api/productos`, {
             headers: { 'X-Tenant-ID': id },
           });
           if (resProd.ok) return resProd.json();
 
-          const resAllProd = await fetch('http://localhost:8080/api/productos');
+          const resAllProd = await fetch(`${API_URL}/api/productos`);
           if (!resAllProd.ok) return [];
           const todos: Product[] = await resAllProd.json();
           return todos.filter((p) => String(p.comercioId) === String(id));
@@ -56,11 +55,11 @@ export default function ComercioDetail() {
       .then(([comercioData, productosData]: [Comercio, Product[]]) => {
         setComercio(comercioData);
         setProducts(productosData || []);
-        setLoading(false); // Asíncrono (dentro del .then)
+        setLoading(false);
       })
       .catch((err) => {
         setError(err.message || 'Error al cargar los datos del catálogo.');
-        setLoading(false); // Asíncrono
+        setLoading(false);
       });
   }, [id]);
 

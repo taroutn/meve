@@ -1,115 +1,88 @@
-.cart-drawer-overlay {
+/* Sombra de fondo (siempre oscura para resaltar el panel) */
+.drawer-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: flex-end;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+/* Panel del carrito - 100% ADAPTATIVO a tus variables */
+.drawer-content {
+  position: fixed;
+  top: 0; right: 0;
+  width: 400px; max-width: 100vw; height: 100vh;
+  /* Usamos la misma variable que usa tu body para el fondo */
+  background-color: var(--color-bg-main); 
+  /* Usamos la misma variable que usa tu body para el texto */
+  color: var(--color-text-main);          
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  animation: slideIn 0.3s forwards ease-out;
 }
 
-.cart-drawer {
-  background: #ffffff;
-  width: 100%;
-  max-width: 400px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
-  animation: slideIn 0.3s ease-out forwards;
+/* Si tu modo oscuro le agrega una clase al body (ej: .dark-mode o [data-theme='dark']) 
+   estas líneas forzarán al Drawer a actualizar sus colores aunque esté renderizado arriba de todo */
+body[data-theme='dark'] .drawer-content,
+body.dark-mode .drawer-content,
+.dark-mode .drawer-content {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-main);
 }
 
-@keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
 
-.cart-header {
+@keyframes slideIn { to { transform: translateX(0); } }
+
+/* Cabecera */
+.drawer-header {
   padding: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eee;
+  /* Usamos un color neutro que sirva en ambos modos, o una variable de borde si tenés */
+  border-bottom: 1px solid rgba(138, 154, 134, 0.3); 
+  display: flex; justify-content: space-between; align-items: center;
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-}
+.drawer-header h2 { margin: 0; color: inherit; }
 
-.cart-empty {
-  padding: 3rem 1.5rem;
-  text-align: center;
-  color: #666;
+.btn-close {
+  background: none; border: none; font-size: 1.5rem; cursor: pointer;
+  color: inherit; transition: transform 0.2s;
 }
+.btn-close:hover { transform: scale(1.1); color: #ff4d4f; }
 
-.cart-items {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
-}
+/* Cuerpo */
+.drawer-body { padding: 1.5rem; flex-grow: 1; overflow-y: auto; }
+.empty-cart { text-align: center; color: inherit; opacity: 0.7; margin-top: 2rem; }
 
+/* Items */
 .cart-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #f5f5f5;
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 1rem; border-bottom: 1px solid rgba(138, 154, 134, 0.3);
+  margin-bottom: 1rem;
 }
+.item-info h4 { margin: 0 0 0.25rem 0; color: inherit; }
+.item-info p { margin: 0; color: var(--color-primary); font-weight: 600; }
 
-.item-info h4 {
-  margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
+.btn-remove {
+  background: transparent; border: 1px solid #ff4d4f; color: #ff4d4f;
+  border-radius: 8px; padding: 0.5rem; cursor: pointer;
 }
+.btn-remove:hover { background: #fff1f0; }
 
-.item-info p {
-  margin: 0;
-  color: #5a7d65;
-  font-weight: bold;
-}
-
-.cart-footer {
+/* Pie (Total y Botón) */
+.drawer-footer {
   padding: 1.5rem;
-  border-top: 1px solid #eee;
-  background: #fafafa;
+  border-top: 1px solid rgba(138, 154, 134, 0.3);
+  /* Hereda el fondo del contenedor principal (.drawer-content) */
+  background-color: inherit; 
 }
-
 .cart-total {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+  display: flex; justify-content: space-between;
+  font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;
+  color: inherit;
 }
-
-.cart-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.btn-vaciar {
-  flex: 1;
-  padding: 0.75rem;
-  background: #ffebee;
-  color: #d32f2f;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
 .btn-checkout {
-  flex: 2;
-  padding: 0.75rem;
-  background: #5a7d65;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
+  width: 100%; padding: 1rem; background-color: var(--color-primary);
+  color: white; border: none; border-radius: 8px; font-size: 1.1rem;
+  font-weight: bold; cursor: pointer;
 }

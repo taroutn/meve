@@ -10,4 +10,6 @@ public interface ProductoRepository extends MongoRepository<Producto, String> {
     // Spring Data MongoDB autogenera la query para esto:
     List<Producto> findByComercioId(String comercioId);
     List<Producto> findByActivoNot(Boolean activo);
+    // Productos de un comercio que NO están eliminados (incluye los que no tienen el campo)
+    List<Producto> findByComercioIdAndEliminadoNot(String comercioId, Boolean eliminado);
 }

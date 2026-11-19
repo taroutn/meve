@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +124,12 @@ public class PedidoService {
 
         pedido.setWhatsappUrl(generarWhatsappUrl(comercio, pedido));
 
+        String prefId = "PREF-SBX-" + pedido.getCodigoTicket();
+        pedido.setPreferenceId(prefId);
+        pedido.setSandboxInitPoint(
+            "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + prefId
+        );
+
         return pedidoRepository.save(pedido);
     }
 
@@ -148,7 +155,7 @@ public class PedidoService {
     // El vendedor confirma que el pedido está pagado: PENDIENTE_PAGO -> PAGADO_CONFIRMADO
     public Pedido confirmarPago(String pedidoId, String comercioIdDelVendedor) {
         Pedido pedido = buscarPedidoDelComercio(pedidoId, comercioIdDelVendedor);
-        return cambiarEstado(pedido, EstadoPedido.PAGADO_CONFIRMADO);
+        return cambiarEstado(pedido, EstadoPedido.PENDIENTE_PAGO, EstadoPedido.PAGADO_CONFIRMADO);
     }
 
     // El cliente retira (RF-30): se verifica el código del ticket. PAGADO_CONFIRMADO -> RETIRADO
@@ -158,7 +165,39 @@ public class PedidoService {
         if (!pedido.getCodigoTicket().equalsIgnoreCase(codigoTicket.trim())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El código del ticket no coincide con el pedido");
         }
-        return cambiarEstado(pedido, EstadoPedido.RETIRADO);
+        return cambiarEstado(pedido, EstadoPedido.PAGADO_CONFIRMADO, EstadoPedido.RETIRADO);
+    }
+
+    // Cancelación explícita (RF-23): solo mientras el pedido espera el pago.
+    // Se pide el código del ticket además del id, para que no alcance con adivinar un id.
+    public Pedido cancelar(String pedidoId, String codigoTicket) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
+        if (!pedido.getCodigoTicket().equalsIgnoreCase(codigoTicket.trim())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El código del ticket no coincide con el pedido");
+        }
+
+        // Si el job de expiración o un pago lo cambiaron un instante antes, esto da 409
+        // y NO se devuelve nada: el stock se libera una sola vez.
+        Pedido cancelado = cambiarEstado(pedido, EstadoPedido.PENDIENTE_PAGO, EstadoPedido.CANCELADO);
+        liberarReserva(cancelado);
+        return cancelado;
+    }
+
+    // Devuelve al stock las unidades del pedido y libera el cupo de su franja.
+    // La usan la cancelación y el job de expiración (#28).
+    public void liberarReserva(Pedido pedido) {
+        for (ItemPedido item : pedido.getItems()) {
+            Query queryProducto = new Query(Criteria.where("id").is(item.getProductoId()));
+            Update sumarStock = new Update().inc("stock", item.getCantidad());
+            mongoTemplate.updateFirst(queryProducto, sumarStock, Producto.class);
+        }
+
+        Query queryFranja = new Query(Criteria.where("id").is(pedido.getComercioId())
+                .and("franjas.rango").is(pedido.getFranjaHoraria()));
+        Update sumarCupo = new Update().inc("franjas.$.cuposDisponibles", 1);
+        mongoTemplate.updateFirst(queryFranja, sumarCupo, Comercio.class);
     }
 
     // El pedido tiene que existir y ser del comercio del vendedor.
@@ -169,19 +208,17 @@ public class PedidoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
     }
 
-    // Cambia el estado solo si el pedido sigue en el estado anterior que corresponde.
+    // Cambia el estado solo si el pedido sigue en el estado esperado.
     // Es un update condicional, igual que en la expiración (#28): si el job lo expiró
     // un instante antes, Mongo no modifica nada y respondemos 409.
-    private Pedido cambiarEstado(Pedido pedido, EstadoPedido nuevoEstado) {
-        EstadoPedido estadoAnterior = (nuevoEstado == EstadoPedido.RETIRADO)
-                ? EstadoPedido.PAGADO_CONFIRMADO
-                : EstadoPedido.PENDIENTE_PAGO;
-
+    // Además guarda el momento exacto de la transición (RNF-11).
+    private Pedido cambiarEstado(Pedido pedido, EstadoPedido estadoEsperado, EstadoPedido nuevoEstado) {
         Query query = new Query(Criteria.where("id").is(pedido.getId())
-                .and("estado").is(estadoAnterior));
+                .and("estado").is(estadoEsperado));
         Update update = new Update()
                 .set("estado", nuevoEstado)
-                .set("updatedAt", LocalDateTime.now());
+                .set("updatedAt", LocalDateTime.now())
+                .set(campoDeFecha(nuevoEstado), Instant.now());
 
         Pedido actualizado = mongoTemplate.findAndModify(
                 query, update, FindAndModifyOptions.options().returnNew(true), Pedido.class);
@@ -191,6 +228,17 @@ public class PedidoService {
                     "El pedido está en estado " + pedido.getEstado() + " y no puede pasar a " + nuevoEstado);
         }
         return actualizado;
+    }
+
+    // Qué atributo de Pedido registra la llegada a cada estado
+    private static String campoDeFecha(EstadoPedido estado) {
+        return switch (estado) {
+            case PAGADO_CONFIRMADO -> "pagadoEn";
+            case RETIRADO -> "retiradoEn";
+            case EXPIRADO -> "expiradoEn";
+            case CANCELADO -> "canceladoEn";
+            case PENDIENTE_PAGO -> throw new IllegalArgumentException("Un pedido no vuelve a PENDIENTE_PAGO");
+        };
     }
 
     private String generarWhatsappUrl(Comercio comercio, Pedido pedido) {
@@ -214,5 +262,20 @@ public class PedidoService {
 
         String textoCodificado = URLEncoder.encode(mensaje.toString(), StandardCharsets.UTF_8);
         return "https://wa.me/" + telefono + "?text=" + textoCodificado;
+    }
+
+    public Pedido confirmarPagoIdempotente(String pedidoIdOCodigo, String paymentId) {
+        Pedido pedidoActual = pedidoRepository.findById(pedidoIdOCodigo)
+                .or(() -> pedidoRepository.findByCodigoTicket(pedidoIdOCodigo))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido no encontrado"));
+
+        if (pedidoActual.getEstado() == EstadoPedido.PAGADO_CONFIRMADO || pedidoActual.getEstado() == EstadoPedido.RETIRADO) {
+            return pedidoActual; 
+        }
+
+        Pedido actualizado = cambiarEstado(pedidoActual, EstadoPedido.PENDIENTE_PAGO, EstadoPedido.PAGADO_CONFIRMADO);
+
+        actualizado.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-SIM");
+        return pedidoRepository.save(actualizado);
     }
 }

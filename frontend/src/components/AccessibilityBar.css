@@ -101,9 +101,7 @@ body.dark-mode {
 body.dark-mode .product-card,
 body.dark-mode .comercio-card,
 body.dark-mode .comercio-header,
-body.dark-mode .cart-drawer,
-body.dark-mode .modal-content,
-body.dark-mode .checkout-form {
+body.dark-mode .modal-content {
   background-color: #1e1e1e !important;
   color: #f1f1f1 !important;
   border-radius: 12px !important;
@@ -111,10 +109,17 @@ body.dark-mode .checkout-form {
   border: none !important;
 }
 
-body.dark-mode .cart-drawer,
-body.dark-mode .cart-drawer-footer {
+body.dark-mode .btn-cancel {
+  color: #f1f1f1 !important;
+  border-color: #f1f1f1 !important; /* Para que el borde también se vea */
+}
+
+body.dark-mode .drawer-content,
+body.dark-mode .drawer-header,
+body.dark-mode .drawer-footer {
   background-color: #1e1e1e !important;
   color: #f1f1f1 !important;
+  border-color: #333 !important;
 }
 
 body.dark-mode .comercio-detail-container {
@@ -228,14 +233,18 @@ body.high-contrast .product-card,
 body.high-contrast .comercio-card,
 body.high-contrast .comercio-header,
 body.high-contrast .comercio-detail-container,
-body.high-contrast .cart-drawer,
-body.high-contrast .cart-footer,
+body.high-contrast .drawer-content,     
+body.high-contrast .drawer-footer,      
 body.high-contrast .quantity-controls,
 body.high-contrast .horario-badge,
 body.high-contrast .search-input,
 body.high-contrast .cart-toggle-btn,
 body.high-contrast .btn-agregar,
 body.high-contrast .btn-confirm,
+body.high-contrast .btn-cancel,
+body.high-contrast .btn-checkout,
+body.high-contrast .btn-whatsapp,
+body.high-contrast .btn-home,
 body.high-contrast input,
 body.high-contrast select {
   background-color: #000000 !important;

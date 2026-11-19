@@ -15,23 +15,24 @@
           "name": "01 - Login vendedor Burger",
           "event": [
             {
-              "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Login de Burger responde 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code === 200) {",
                   "    const body = pm.response.json();",
-                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
-                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
-                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    pm.test(\"Devuelve un accessToken de tipo Bearer\", () => {",
+                  "        pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tokenType).to.eql(\"Bearer\");",
                   "    });",
-                  "    pm.collectionVariables.set(\"token_burger\", body.token);",
+                  "    pm.collectionVariables.set(\"token_burger\", body.accessToken);",
                   "}"
-                ]
-              }
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
             }
           ],
+          "id": "daf4fc61-3d54-448c-8442-cc31e5665d4e",
           "request": {
             "auth": {
               "type": "noauth"
@@ -65,23 +66,24 @@
           "name": "02 - Login vendedor de otro comercio",
           "event": [
             {
-              "listen": "test",
               "script": {
-                "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Login de otro comercio responde 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code === 200) {",
                   "    const body = pm.response.json();",
-                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
-                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
-                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    pm.test(\"Devuelve un accessToken de tipo Bearer\", () => {",
+                  "        pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tokenType).to.eql(\"Bearer\");",
                   "    });",
-                  "    pm.collectionVariables.set(\"token_otro\", body.token);",
+                  "    pm.collectionVariables.set(\"token_otro\", body.accessToken);",
                   "}"
-                ]
-              }
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
             }
           ],
+          "id": "be34182a-a4fc-419f-9af8-12f810684f12",
           "request": {
             "auth": {
               "type": "noauth"
@@ -115,23 +117,24 @@
           "name": "03 - Login admin",
           "event": [
             {
-              "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Login de admin responde 200\", () => pm.response.to.have.status(200));",
                   "if (pm.response.code === 200) {",
                   "    const body = pm.response.json();",
-                  "    pm.test(\"Devuelve un token de tipo Bearer\", () => {",
-                  "        pm.expect(body.token).to.be.a(\"string\").and.not.empty;",
-                  "        pm.expect(body.tipo).to.eql(\"Bearer\");",
+                  "    pm.test(\"Devuelve un accessToken de tipo Bearer\", () => {",
+                  "        pm.expect(body.accessToken).to.be.a(\"string\").and.not.empty;",
+                  "        pm.expect(body.tokenType).to.eql(\"Bearer\");",
                   "    });",
-                  "    pm.collectionVariables.set(\"token_admin\", body.token);",
+                  "    pm.collectionVariables.set(\"token_admin\", body.accessToken);",
                   "}"
                 ]
-              }
+              },
+              "listen": "test"
             }
           ],
+          "id": "77b4dc75-822f-4a32-ab49-aa3d0a94ec3a",
           "request": {
             "auth": {
               "type": "noauth"
@@ -174,6 +177,7 @@
               }
             }
           ],
+          "id": "a4afd140-f7bd-4a15-b8f9-113f7947eb0f",
           "request": {
             "auth": {
               "type": "noauth"
@@ -203,7 +207,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "id": "e7fdbd0f-12d8-4bab-a1d9-6bb8e2aac037"
     },
     {
       "name": "2. Permisos por rol",
@@ -221,6 +226,7 @@
               }
             }
           ],
+          "id": "8435ff53-5034-48d0-8c4d-966218fbbf15",
           "request": {
             "auth": {
               "type": "noauth"
@@ -262,6 +268,7 @@
               }
             }
           ],
+          "id": "405edb2b-aadc-4dd9-85c2-d4776a6adde2",
           "request": {
             "auth": {
               "type": "bearer",
@@ -296,8 +303,86 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "48 - POST a ruta no pública de pedidos sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Ruta no pública bajo /api/pedidos pide token (401)\", () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "b799ee42-7463-4715-8faf-3a54dd3efe90",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/cualquier-cosa",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "cualquier-cosa"
+              ]
+            },
+            "description": "Tarjetas #38 y #44. Bajo /api/pedidos solo son públicos tres POST: crear pedido (/api/pedidos), el webhook (/api/pedidos/webhook) y cancelar con el código del ticket (/api/pedidos/{id}/cancelar). Cualquier otro POST ahí abajo cae en la regla final (anyRequest().authenticated()) y sin token tiene que dar 401. Antes la regla era /api/pedidos/** y esta ruta pasaba el filtro de seguridad."
+          },
+          "response": []
+        },
+        {
+          "name": "49 - Webhook de pago con pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El webhook sigue público: no pide token\", () => pm.expect(pm.response.code).to.not.eql(401));",
+                  "pm.test(\"Pedido inexistente (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "dcc1ef4b-f3fb-4a87-818c-ed55b1ddc374",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/webhook?pedidoId=no-existe",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "webhook"
+              ],
+              "query": [
+                {
+                  "key": "pedidoId",
+                  "value": "no-existe"
+                }
+              ]
+            },
+            "description": "Tarjeta #38. El webhook de Mercado Pago sigue siendo público (es simulado y no valida la firma de MP), así que sin token tiene que llegar al código y no dar 401. Con un pedido que no existe responde 404 y no modifica nada en la base."
+          },
+          "response": []
         }
-      ]
+      ],
+      "id": "cc3253a7-7ff8-4d67-bcb6-c3d0b5c8ce56"
     },
     {
       "name": "3. Pedido Click & Collect",
@@ -325,6 +410,7 @@
               }
             }
           ],
+          "id": "383459c1-69e0-4b2d-a13a-bb1922f067fc",
           "request": {
             "auth": {
               "type": "noauth"
@@ -366,6 +452,7 @@
               }
             }
           ],
+          "id": "8bd1431e-48d3-4bd8-b188-01507f9588e5",
           "request": {
             "auth": {
               "type": "noauth"
@@ -409,6 +496,7 @@
               }
             }
           ],
+          "id": "7191c93b-bf1d-41f8-b726-e2ecc7486f70",
           "request": {
             "auth": {
               "type": "noauth"
@@ -453,6 +541,7 @@
               }
             }
           ],
+          "id": "9044c496-6cf6-47e7-bda4-b73baf21b0c5",
           "request": {
             "auth": {
               "type": "noauth"
@@ -490,6 +579,7 @@
               }
             }
           ],
+          "id": "d21ab422-adac-4040-9c4c-1dd4a5bfe684",
           "request": {
             "auth": {
               "type": "noauth"
@@ -510,7 +600,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "id": "b6c62454-43aa-4e72-9b8c-f62c497c6a98"
     },
     {
       "name": "4. Panel y acceso cruzado",
@@ -533,6 +624,7 @@
               }
             }
           ],
+          "id": "70a117f8-1f58-4166-a502-39d0769ff584",
           "request": {
             "auth": {
               "type": "bearer",
@@ -574,6 +666,7 @@
               }
             }
           ],
+          "id": "4366c020-2537-4e03-8f9e-50ff3d47fa5a",
           "request": {
             "auth": {
               "type": "noauth"
@@ -608,6 +701,7 @@
               }
             }
           ],
+          "id": "9923f2ec-b5e5-40a8-8bc8-846fce31fda8",
           "request": {
             "auth": {
               "type": "bearer",
@@ -636,7 +730,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "id": "8671a6a8-fbcb-4551-9185-946cae858a09"
     },
     {
       "name": "5. Pago y retiro",
@@ -654,6 +749,7 @@
               }
             }
           ],
+          "id": "16b00740-4fb6-4ebe-ad76-da7d85e3d755",
           "request": {
             "auth": {
               "type": "bearer",
@@ -704,6 +800,7 @@
               }
             }
           ],
+          "id": "76517597-6eba-43be-8bfb-575f6393e71b",
           "request": {
             "auth": {
               "type": "bearer",
@@ -746,6 +843,7 @@
               }
             }
           ],
+          "id": "74641517-a622-4246-864b-f3482b750e89",
           "request": {
             "auth": {
               "type": "bearer",
@@ -787,6 +885,7 @@
               }
             }
           ],
+          "id": "40d676f3-032a-4ff9-a627-7d54cd0995be",
           "request": {
             "auth": {
               "type": "bearer",
@@ -828,6 +927,7 @@
               }
             }
           ],
+          "id": "92ed59d8-226d-478e-a13d-abccecb9c5ef",
           "request": {
             "auth": {
               "type": "bearer",
@@ -878,6 +978,7 @@
               }
             }
           ],
+          "id": "fa525b3a-c47b-4d63-a42b-63cdc6f93318",
           "request": {
             "auth": {
               "type": "bearer",
@@ -929,6 +1030,7 @@
               }
             }
           ],
+          "id": "2d30eb10-6ced-4d3a-8eca-3eb43492afe4",
           "request": {
             "auth": {
               "type": "bearer",
@@ -982,6 +1084,7 @@
               }
             }
           ],
+          "id": "0ca5be6e-fa67-410f-ab1e-7a326b756471",
           "request": {
             "auth": {
               "type": "bearer",
@@ -1015,8 +1118,1819 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "50 - Cancelación: elegir franja con cupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Detalle del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const conCupo = (pm.response.json().franjas || [])",
+                  "    .filter(f => f.cuposDisponibles > 0)",
+                  "    .sort((a, b) => b.cuposDisponibles - a.cuposDisponibles);",
+                  "pm.test(\"Hay al menos una franja con cupo disponible\", () => pm.expect(conCupo.length).to.be.above(0));",
+                  "if (conCupo.length > 0) {",
+                  "    pm.collectionVariables.set(\"franja\", conCupo[0].rango);",
+                  "    pm.collectionVariables.set(\"cuposAntes\", conCupo[0].cuposDisponibles);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "id": "e990b0d4-c273-788d-0b3c-8d0ee3adc2ed",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            },
+            "description": "Tarjeta #44. Arranca el flujo de cancelación: elige la franja con más cupos y guarda cuántos tenía."
+          },
+          "response": []
+        },
+        {
+          "name": "51 - Cancelación: stock antes del pedido",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "pm.test(\"El producto existe y tiene stock\", () => {",
+                  "    pm.expect(producto, \"producto\").to.exist;",
+                  "    pm.expect(producto.stock).to.be.above(0);",
+                  "});",
+                  "if (producto) pm.collectionVariables.set(\"stockAntes\", producto.stock);"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "0acc91f7-3652-4416-93f6-c688dcad9445",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "Tarjeta #44. Guarda el stock del producto antes de crear el pedido que se va a cancelar."
+          },
+          "response": []
+        },
+        {
+          "name": "52 - Crear pedido para cancelar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Pedido creado (201)\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const pedido = pm.response.json();",
+                  "    pm.test(\"Queda en PENDIENTE_PAGO\", () => pm.expect(pedido.estado).to.eql(\"PENDIENTE_PAGO\"));",
+                  "    pm.collectionVariables.set(\"e2e_cancelarId\", pedido.id);",
+                  "    pm.collectionVariables.set(\"e2e_cancelarTicket\", pedido.codigoTicket);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "cd4ea2f0-305e-6b45-ad54-1e493b4b90a7",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comercioId\": \"{{comercioId}}\",\n  \"compradorNombre\": \"Prueba E2E cancelación\",\n  \"compradorTelefono\": \"3884000000\",\n  \"franjaHoraria\": \"{{franja}}\",\n  \"items\": [\n    {\n      \"productoId\": \"{{productoId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos"
+              ]
+            },
+            "description": "Tarjeta #44. Pedido guest que queda en PENDIENTE_PAGO; se guarda en e2e_cancelarId y e2e_cancelarTicket."
+          },
+          "response": []
+        },
+        {
+          "name": "53 - Cancelar con ticket equivocado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Ticket equivocado responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "id": "95d6b5a5-90c4-457c-fb70-5d07202b106d",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"MEVE-XXXXXX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_cancelarId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_cancelarId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. El código no coincide con el del pedido: 400 y el pedido sigue pendiente."
+          },
+          "response": []
+        },
+        {
+          "name": "54 - Cancelar sin código",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Sin código responde 400\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "38cd5abc-943a-b5f3-eb51-2f63f40921e1",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_cancelarId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_cancelarId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. Sin codigoTicket falla la validación del body: 400."
+          },
+          "response": []
+        },
+        {
+          "name": "55 - Cancelar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Cancelar responde 200 sin token\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const pedido = pm.response.json();",
+                  "    pm.test(\"Queda CANCELADO con la fecha de cancelación\", () => {",
+                  "        pm.expect(pedido.estado).to.eql(\"CANCELADO\");",
+                  "        pm.expect(pedido.canceladoEn).to.be.a(\"string\");",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "85a8927a-3ae1-1f18-ed05-1c7596b0d194",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_cancelarTicket}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_cancelarId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_cancelarId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. Público (sin token) con el código correcto: el pedido pasa a CANCELADO y queda la fecha en canceladoEn (RNF-11)."
+          },
+          "response": []
+        },
+        {
+          "name": "56 - Stock devuelto",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "pm.test(\"La cancelación devolvió el stock\", () => pm.expect(producto.stock).to.eql(Number(pm.collectionVariables.get(\"stockAntes\"))));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "d42a61fe-8ae3-f4f6-6a57-2a87337ff161",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "Tarjeta #44. Después de cancelar, el producto vuelve al stock que tenía antes del pedido."
+          },
+          "response": []
+        },
+        {
+          "name": "57 - Cupo devuelto",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Detalle del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "const franja = pm.response.json().franjas.find(f => f.rango === pm.collectionVariables.get(\"franja\"));",
+                  "pm.test(\"La cancelación devolvió el cupo\", () => pm.expect(franja.cuposDisponibles).to.eql(Number(pm.collectionVariables.get(\"cuposAntes\"))));"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "6374c4de-acad-0e15-d3ad-4cf693ae3ac4",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            },
+            "description": "Tarjeta #44. La franja recupera el cupo que había ocupado el pedido cancelado."
+          },
+          "response": []
+        },
+        {
+          "name": "58 - Cancelar dos veces",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cancelar un pedido ya cancelado responde 409\", () => pm.response.to.have.status(409));"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "cd9fe204-b0a4-f117-6456-33eb402bb738",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_cancelarTicket}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_cancelarId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_cancelarId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. Ya está CANCELADO: 409 y no devuelve stock ni cupo de nuevo."
+          },
+          "response": []
+        },
+        {
+          "name": "59 - Cancelar pedido ya retirado",
+          "event": [
+            {
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cancelar un pedido retirado responde 409\", () => pm.response.to.have.status(409));"
+                ]
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "c051f552-1c97-22ef-2793-7e8511192396",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"{{e2e_codigoTicket}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{e2e_pedidoId}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{e2e_pedidoId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. El pedido del flujo principal ya está RETIRADO: no se puede cancelar (409)."
+          },
+          "response": []
+        },
+        {
+          "name": "60 - Cancelar pedido inexistente",
+          "event": [
+            {
+              "script": {
+                "exec": [
+                  "pm.test(\"Pedido inexistente responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Lo responde el endpoint de cancelación (no es una ruta inexistente)\", () => pm.expect(pm.response.json().message).to.eql(\"Pedido no encontrado\"));"
+                ],
+                "type": "text/javascript"
+              },
+              "listen": "test"
+            }
+          ],
+          "id": "b1133816-3e8d-bac2-1fa3-3cc3fa51de78",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "value": "application/json",
+                "key": "Content-Type"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTicket\": \"MEVE-XXXXXX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/no-existe/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "no-existe",
+                "cancelar"
+              ]
+            },
+            "description": "Tarjeta #44. Ruta pública, pero el pedido no existe: 404."
+          },
+          "response": []
         }
-      ]
+      ],
+      "id": "52fbacd2-eb84-4c2a-aba9-604c0af2a377"
+    },
+    {
+      "name": "6. Gestión del comercio y catálogo",
+      "item": [
+        {
+          "name": "23 - Editar comercio (Burger)",
+          "id": "5065c450-cb2b-4d17-ba96-acd08edebbca",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"horarios\": \"Martes a Domingos de 19:00 a 00:00\",\r\n  \"franjas\": [\r\n    { \"rango\": \"10:00 - 11:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"11:00 - 12:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"17:00 - 18:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"18:00 - 19:00\", \"capacidadMaxima\": 3 }\r\n  ],\r\n  \"lat\": -24.2562,\r\n  \"lng\": -65.2114\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "24 - Editar comercio de Burger con token de otro",
+          "id": "187c3a6b-17e0-4431-ae33-cd9da0745455",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"horarios\": \"Martes a Domingos de 19:00 a 00:00\",\r\n  \"franjas\": [\r\n    { \"rango\": \"10:00 - 11:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"11:00 - 12:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"17:00 - 18:00\", \"capacidadMaxima\": 3 },\r\n    { \"rango\": \"18:00 - 19:00\", \"capacidadMaxima\": 3 }\r\n  ],\r\n  \"lat\": -24.2562,\r\n  \"lng\": -65.2114\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "25 - Crear comercio de prueba (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Crear comercio como admin responde 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"El comercio nace PENDIENTE e inactivo\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"PENDIENTE\");",
+                  "        pm.expect(body.activo).to.eql(false);",
+                  "    });",
+                  "    pm.collectionVariables.set(\"comercioPruebaId\", body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "44c6ec50-bb6e-4f07-b976-7c13f6a2467f",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Comercio de prueba moderacion\",\n  \"descripcion\": \"Creado por la coleccion E2E para probar la tarea 35\",\n  \"whatsapp\": \"3884000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios"
+              ]
+            },
+            "description": "Crea un comercio solo para probar la moderación (tarea 35). Nace PENDIENTE y al final de la carpeta queda SUSPENDIDO, así que no se ve en la vitrina. Cada corrida crea uno nuevo."
+          },
+          "response": []
+        },
+        {
+          "name": "26 - Listar todos los comercios (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Listado de admin responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const lista = pm.response.json();",
+                  "    const prueba = lista.find(c => c.id === pm.collectionVariables.get(\"comercioPruebaId\"));",
+                  "    pm.test(\"Incluye el comercio de prueba en estado PENDIENTE\", () => {",
+                  "        pm.expect(prueba, \"comercio de prueba\").to.exist;",
+                  "        pm.expect(prueba.estado).to.eql(\"PENDIENTE\");",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "e74c744f-4f66-490f-a2f6-684cfda136ee",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin ve todos los comercios, incluidos los PENDIENTE que la vitrina no muestra."
+          },
+          "response": []
+        },
+        {
+          "name": "27 - Listar todos los comercios como vendedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un vendedor no puede usar las rutas de admin (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "a754940b-20dd-413b-9d51-5d776ac777ac",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios"
+              ]
+            },
+            "description": "Todo /api/admin/** exige rol SUPERADMIN: un vendedor recibe 403."
+          },
+          "response": []
+        },
+        {
+          "name": "28 - Comercio pendiente no aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio pendiente no se ve en la vitrina (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "2baac6a8-fb3f-4658-9223-e3ecb76d6f14",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Un comercio PENDIENTE no es visible para los compradores: el detalle público responde 404."
+          },
+          "response": []
+        },
+        {
+          "name": "29 - Aprobar comercio de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Aprobar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda ACTIVO y visible (activo = true)\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"ACTIVO\");",
+                  "        pm.expect(body.activo).to.eql(true);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "c3d237a1-5f67-4fbc-acd9-64de58778a2c",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin aprueba el comercio. Pasa a ACTIVO y activo = true."
+          },
+          "response": []
+        },
+        {
+          "name": "30 - Comercio aprobado aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio aprobado se ve en la vitrina (200)\", () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "25e08d18-4aec-45fa-a087-a56802d77017",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Después de aprobarlo, el detalle público del comercio responde 200."
+          },
+          "response": []
+        },
+        {
+          "name": "31 - Volver a PENDIENTE (rechazado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"No se puede volver a PENDIENTE (400)\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "73810bee-b74c-4ae6-af5c-a8c9d04486ec",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"PENDIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "La moderación solo aprueba o suspende: PENDIENTE es el estado inicial y no se puede volver a él (400)."
+          },
+          "response": []
+        },
+        {
+          "name": "32 - Estado inválido (rechazado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un estado que no existe se rechaza (400)\", () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "3e3db949-c6a1-469a-b414-0e7924932aae",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"APROBADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "El estado es un enum (PENDIENTE, ACTIVO, SUSPENDIDO): cualquier otro valor se rechaza con 400 sin llegar a la base."
+          },
+          "response": []
+        },
+        {
+          "name": "33 - Suspender comercio de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Suspender responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda SUSPENDIDO y oculto (activo = false)\", () => {",
+                  "        pm.expect(body.estado).to.eql(\"SUSPENDIDO\");",
+                  "        pm.expect(body.activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "8bc7716d-d65d-4938-a79e-248cf8f81ebf",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioPruebaId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioPruebaId}}",
+                "estado"
+              ]
+            },
+            "description": "RF-07: el SuperAdmin suspende el comercio. Pasa a SUSPENDIDO y activo = false. Queda así al terminar la carpeta."
+          },
+          "response": []
+        },
+        {
+          "name": "34 - Comercio suspendido no aparece en la vitrina",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"El comercio suspendido no se ve en la vitrina (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "6c9b0e53-d868-4453-91d2-d8cca078e6f5",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioPruebaId}}"
+              ]
+            },
+            "description": "Al suspenderlo, el comercio desaparece de la vitrina: el detalle público vuelve a responder 404."
+          },
+          "response": []
+        },
+        {
+          "name": "35 - Vendedor intenta aprobarse solo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un vendedor no puede moderar comercios (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "1ded54e4-17e6-4772-8cd8-5538c1e07017",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/comercios/{{comercioId}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "comercios",
+                "{{comercioId}}",
+                "estado"
+              ]
+            },
+            "description": "Un vendedor no puede cambiar el estado de ningún comercio, ni siquiera el suyo: la moderación es solo del SuperAdmin (403)."
+          },
+          "response": []
+        },
+        {
+          "name": "36 - Mis productos (Burger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const lista = pm.response.json();",
+                  "    pm.test(\"Todos son de Burger y ninguno está eliminado\", () => {",
+                  "        lista.forEach(p => {",
+                  "            pm.expect(p.comercioId).to.eql(pm.collectionVariables.get(\"comercioId\"));",
+                  "            pm.expect(p.eliminado).to.not.eql(true);",
+                  "        });",
+                  "    });",
+                  "    pm.test(\"Incluye el producto de Burger que usa la colección\", () => {",
+                  "        pm.expect(lista.map(p => p.id)).to.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "722f7f22-5e71-4e32-a78a-c530f1888304",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El vendedor ve sus productos activos y pausados, nunca los eliminados ni los de otro comercio. El comercio sale del token."
+          },
+          "response": []
+        },
+        {
+          "name": "37 - Pausar producto de Burger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Pausar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto queda pausado (activo = false)\", () => {",
+                  "        pm.expect(pm.response.json().activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "fa5c96da-cc54-47bf-b5ed-d9ce96145652",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}/publicacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}",
+                "publicacion"
+              ]
+            },
+            "description": "RF-10: el vendedor pausa el producto (activo = false). El request 40 lo vuelve a publicar."
+          },
+          "response": []
+        },
+        {
+          "name": "38 - Producto pausado no aparece en el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto pausado no se ve en el catálogo\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.not.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "90fdc2f9-9df6-4e45-ad72-e076631450e4",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "El catálogo público del comercio solo muestra productos activos: el pausado no aparece."
+          },
+          "response": []
+        },
+        {
+          "name": "39 - Producto pausado sigue en mis productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const producto = pm.response.json().find(p => p.id === pm.collectionVariables.get(\"productoId\"));",
+                  "    pm.test(\"El producto pausado sigue en la lista del vendedor, con activo = false\", () => {",
+                  "        pm.expect(producto, \"producto pausado\").to.exist;",
+                  "        pm.expect(producto.activo).to.eql(false);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "4af2d343-e5b1-423a-9d85-c1151aea3a15",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El vendedor sigue viendo el producto pausado en su panel, para poder reactivarlo."
+          },
+          "response": []
+        },
+        {
+          "name": "40 - Reactivar producto de Burger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Reactivar responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto vuelve a estar publicado (activo = true)\", () => {",
+                  "        pm.expect(pm.response.json().activo).to.eql(true);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "a4105d51-2fb2-4f80-b50e-3ecd1b86d535",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}/publicacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}",
+                "publicacion"
+              ]
+            },
+            "description": "RF-10: el vendedor vuelve a publicar el producto (activo = true). Deja el producto como estaba antes del request 37."
+          },
+          "response": []
+        },
+        {
+          "name": "41 - Producto reactivado vuelve al catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Catálogo del comercio responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto reactivado vuelve a verse en el catálogo\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.include(pm.collectionVariables.get(\"productoId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "d00ca341-16e0-4cea-9535-ac9a5a128a22",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/comercios/{{comercioId}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "comercios",
+                "{{comercioId}}",
+                "productos"
+              ]
+            },
+            "description": "Después de reactivarlo, el producto vuelve a aparecer en el catálogo público del comercio."
+          },
+          "response": []
+        },
+        {
+          "name": "42 - Editar producto de Burger con token de otro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Otro vendedor no puede editar productos de Burger (403)\", () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "bc6cf5f7-84e4-4ee1-9b39-dd0b7a83ee1c",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_otro}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Intento de otro comercio\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 1,\n  \"stock\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoId}}"
+              ]
+            },
+            "description": "Aislamiento por comercio: un vendedor no puede modificar productos de otro comercio (403). El body es válido a propósito, para que el rechazo venga de la validación de pertenencia y no de un error de datos."
+          },
+          "response": []
+        },
+        {
+          "name": "43 - Crear producto de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Crear producto responde 201\", () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Queda asociado a Burger y activo\", () => {",
+                  "        pm.expect(body.comercioId).to.eql(pm.collectionVariables.get(\"comercioId\"));",
+                  "        pm.expect(body.activo).to.eql(true);",
+                  "    });",
+                  "    pm.collectionVariables.set(\"productoPruebaId\", body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "4070948e-2672-4769-b82b-e1adaffd2e42",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 100,\n  \"stock\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos"
+              ]
+            },
+            "description": "Crea un producto solo para probar la edición y la baja lógica, así no se toca ningún producto real. El request 45 lo elimina."
+          },
+          "response": []
+        },
+        {
+          "name": "44 - Editar producto de prueba (precio y stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Editar producto responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.test(\"Se guardaron el nombre, el precio y el stock nuevos\", () => {",
+                  "        pm.expect(body.nombre).to.eql(\"Producto de prueba E2E (editado)\");",
+                  "        pm.expect(body.precio).to.eql(150);",
+                  "        pm.expect(body.stock).to.eql(12);",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "8ba12323-5ba0-4bf7-85ef-faf2e387b041",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E (editado)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 150,\n  \"stock\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "RF-08 y RF-11: el vendedor modifica los datos de su producto y ajusta el stock a mano."
+          },
+          "response": []
+        },
+        {
+          "name": "45 - Eliminar producto de prueba (baja lógica)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Eliminar producto responde 204\", () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "62f30048-4201-4cdd-8d00-bfca57647f75",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "RF-09: baja lógica. El documento queda en la base (eliminado = true, activo = false) para no romper pedidos históricos. Responde 204 sin body."
+          },
+          "response": []
+        },
+        {
+          "name": "46 - Editar producto eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Un producto eliminado no se puede editar (404)\", () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "de34b33d-4006-4ea5-8881-74e29fbd7d1d",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Producto de prueba E2E (resucitado)\",\n  \"categoria\": \"Pruebas\",\n  \"precio\": 150,\n  \"stock\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/productos/{{productoPruebaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "{{productoPruebaId}}"
+              ]
+            },
+            "description": "Un producto eliminado ya no existe para el negocio: no se puede editar ni reactivar (404)."
+          },
+          "response": []
+        },
+        {
+          "name": "47 - Producto eliminado no aparece en mis productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Mis productos responde 200\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test(\"El producto eliminado ya no aparece en la lista del vendedor\", () => {",
+                  "        const ids = pm.response.json().map(p => p.id);",
+                  "        pm.expect(ids).to.not.include(pm.collectionVariables.get(\"productoPruebaId\"));",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "id": "33ffa12e-997f-4004-ab03-71cefd3d6eb2",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_burger}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/productos/mios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "productos",
+                "mios"
+              ]
+            },
+            "description": "El producto dado de baja desaparece también del panel del vendedor."
+          },
+          "response": []
+        }
+      ],
+      "id": "fa15b489-493c-4f47-ae97-021b2d7e1621"
     }
   ],
   "variable": [
@@ -1058,6 +2972,14 @@
     },
     {
       "key": "e2e_codigoTicket",
+      "value": ""
+    },
+    {
+      "key": "comercioPruebaId",
+      "value": ""
+    },
+    {
+      "key": "productoPruebaId",
       "value": ""
     }
   ]

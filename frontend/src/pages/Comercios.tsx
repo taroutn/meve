@@ -3,13 +3,15 @@ import ComercioCard from '../components/ComercioCard';
 import Spinner from '../components/Spinner';
 import type { Comercio } from '../types/comercio';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 export default function Comercios() {
   const [comercios, setComercios] = useState<Comercio[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/comercios')
+    fetch(`${API_URL}/api/comercios`)
       .then((res) => {
         if (!res.ok) throw new Error('Error al obtener los comercios.');
         return res.json();

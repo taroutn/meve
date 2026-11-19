@@ -10,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.data.geo.Distance;
 
 @Service
 public class ProductoService {
@@ -39,41 +40,6 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
-    public List<ProductoCatalogoDTO> listarCatalogoPublico() {
-        // 1. Traemos los productos activos
-        List<Producto> productos = productoRepository.findByActivoNot(false);
-
-        // 2. Juntamos los ids de sus comercios, sin repetir
-        Set<String> comercioIds = new HashSet<>();
-        for (Producto producto : productos) {
-            if (producto.getComercioId() != null) {
-                comercioIds.add(producto.getComercioId());
-            }
-        }
-
-        // 3. Traemos todos esos comercios en UNA sola consulta
-        //    y armamos un "diccionario": id del comercio -> nombre del comercio
-        Map<String, String> nombrePorComercioId = new HashMap<>();
-        for (Comercio comercio : comercioRepository.findAllById(comercioIds)) {
-            nombrePorComercioId.put(comercio.getId(), comercio.getNombre());
-        }
-
-        // 4. Armamos la respuesta: cada producto con el nombre de su comercio
-        //    (si el comercio no existe, comercioNombre queda en null)
-        List<ProductoCatalogoDTO> catalogo = new ArrayList<>();
-        for (Producto producto : productos) {
-            catalogo.add(new ProductoCatalogoDTO(
-                    producto.getId(),
-                    producto.getNombre(),
-                    producto.getPrecio(),
-                    producto.getComercioId(),
-                    nombrePorComercioId.get(producto.getComercioId()),
-                    producto.getCategoria()
-            ));
-        }
-        return catalogo;
-    }
-
     public List<Producto> listarProductosPorComercio(String comercioId) {
         List<Producto> productosDelComercio = productoRepository.findByComercioId(comercioId);
         List<Producto> activos = new ArrayList<>();
@@ -84,5 +50,81 @@ public class ProductoService {
             }
         }
         return activos;
+    }
+
+    public List<ProductoCatalogoDTO> listarCatalogoPublico(
+            String q,
+            String categoria,
+            Boolean disponible,
+            Double lat,
+            Double lng,
+            Double radioKm
+    ) {
+        // 1. Obtener comercios activos
+        List<Comercio> comerciosValidos;
+        if (lat != null && lng != null) {
+            double radio = (radioKm != null && radioKm > 0) ? radioKm : 5.0;
+            comerciosValidos = comercioRepository.findByActivoTrueAndUbicacionNear(
+                    new Point(lng, lat),
+                    new Distance(radio, Metrics.KILOMETERS)
+            );
+        } else {
+            comerciosValidos = comercioRepository.findByActivoTrue();
+        }
+
+        if (comerciosValidos.isEmpty()) {
+            return List.of();
+        }
+
+        // Mapa manteniendo el orden de proximidad de los comercios (LinkedHashMap)
+        Map<String, Comercio> mapaComercios = new LinkedHashMap<>();
+        for (Comercio c : comerciosValidos) {
+            mapaComercios.put(c.getId(), c);
+        }
+
+        // 2. Traer productos activos y aplicar filtros en memoria sobre el set de comercios cercanos
+        List<Producto> todosActivos = productoRepository.findByActivoNot(false);
+        String textoBusqueda = (q != null && !q.isBlank()) ? q.trim().toLowerCase() : null;
+        String catFiltro = (categoria != null && !categoria.isBlank()) ? categoria.trim().toLowerCase() : null;
+
+        List<ProductoCatalogoDTO> resultado = new java.util.ArrayList<>();
+
+        // Iteramos respetando el orden de cercanía de los comercios
+        for (String comercioId : mapaComercios.keySet()) {
+            Comercio comercio = mapaComercios.get(comercioId);
+
+            for (Producto p : todosActivos) {
+                if (!comercioId.equals(p.getComercioId())) {
+                    continue;
+                }
+                // Filtro de disponibilidad (RF-16)
+                if (Boolean.TRUE.equals(disponible) && (p.getStock() == null || p.getStock() <= 0)) {
+                    continue;
+                }
+                // Filtro de categoría (RF-16)
+                if (catFiltro != null && (p.getCategoria() == null || !p.getCategoria().toLowerCase().equals(catFiltro))) {
+                    continue;
+                }
+                // Búsqueda textual en nombre
+                if (textoBusqueda != null) {
+                    boolean coincideNombre = p.getNombre() != null && p.getNombre().toLowerCase().contains(textoBusqueda);
+                    if (!coincideNombre) {
+                        continue;
+                    }
+                }
+
+                // Mapear al DTO público que ya usan en el frontend
+                resultado.add(new ProductoCatalogoDTO(
+                    p.getId(),
+                    p.getNombre(),
+                    p.getPrecio(),
+                    p.getComercioId(),
+                    comercio.getNombre(),
+                    p.getCategoria()
+                ));
+            }
+        }
+
+        return resultado;
     }
 }
