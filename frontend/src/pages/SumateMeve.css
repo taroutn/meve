@@ -1,0 +1,330 @@
+.sumate-container {
+  max-width: 720px;
+  margin: 2.5rem auto;
+  padding: 0 1rem;
+}
+
+.sumate-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5ece7;
+}
+
+.sumate-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.sumate-header h2 {
+  color: #5a7d65;
+  font-size: 1.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.sumate-header p {
+  color: #555;
+  font-size: 1rem;
+}
+
+.sumate-alerta.error {
+  background-color: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6cb;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.sumate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sumate-seccion {
+  border: 1px solid #dce5df;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sumate-seccion legend {
+  font-weight: 700;
+  color: #5a7d65;
+  padding: 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.form-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .form-fila {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-grupo label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-grupo input {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #cbd5ce;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-grupo input:focus {
+  outline: none;
+  border-color: #5a7d65;
+  box-shadow: 0 0 0 3px rgba(90, 125, 101, 0.15);
+}
+
+.ubicacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.ubicacion-header span {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-geo {
+  background-color: #eef4f0;
+  color: #5a7d65;
+  border: 1px solid #5a7d65;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-geo:hover:not(:disabled) {
+  background-color: #5a7d65;
+  color: #ffffff;
+}
+
+.btn-geo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.geo-exito {
+  color: #2e7d32;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.btn-submit-sumate {
+  background-color: #5a7d65;
+  color: #ffffff;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-submit-sumate:hover:not(:disabled) {
+  background-color: #496753;
+  transform: translateY(-1px);
+}
+
+.btn-submit-sumate:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.sumate-login-link {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+}
+
+.sumate-login-link a {
+  color: #5a7d65;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sumate-login-link a:hover {
+  text-decoration: underline;
+}
+
+/* === PANTALLA DE CONFIRMACIÓN === */
+.sumate-confirmacion {
+  text-align: center;
+}
+
+.confirmacion-icono {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.confirmacion-subtitulo {
+  color: #444;
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.estado-pendiente-box {
+  background-color: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.badge-pendiente {
+  display: inline-block;
+  background-color: #f57c00;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.estado-pendiente-box p {
+  color: #4e342e;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.confirmacion-acciones {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-sumate-primario,
+.btn-sumate-secundario {
+  padding: 0.7rem 1.35rem;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.btn-sumate-primario {
+  background-color: #5a7d65;
+  color: #ffffff;
+}
+
+.btn-sumate-secundario {
+  background-color: #eef4f0;
+  color: #5a7d65;
+  border: 1px solid #5a7d65;
+}
+
+/* === MODO OSCURO === */
+body.dark-mode .sumate-card {
+  background-color: #1e1e1e;
+  border-color: #333;
+}
+
+body.dark-mode .sumate-header h2,
+body.dark-mode .sumate-seccion legend {
+  color: #8fb99a;
+}
+
+body.dark-mode .sumate-header p,
+body.dark-mode .form-grupo label,
+body.dark-mode .ubicacion-header span,
+body.dark-mode .sumate-login-link,
+body.dark-mode .confirmacion-subtitulo {
+  color: #e0e0e0;
+}
+
+body.dark-mode .sumate-seccion {
+  border-color: #3a3a3a;
+}
+
+body.dark-mode .form-grupo input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
+}
+
+body.dark-mode .estado-pendiente-box {
+  background-color: #2c2516;
+  border-color: #665222;
+}
+
+body.dark-mode .estado-pendiente-box p {
+  color: #f5e6c4;
+}
+
+/* === ALTO CONTRASTE === */
+body.high-contrast .sumate-card,
+body.high-contrast .sumate-seccion,
+body.high-contrast .estado-pendiente-box {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+body.high-contrast .sumate-header h2,
+body.high-contrast .sumate-header p,
+body.high-contrast .sumate-seccion legend,
+body.high-contrast .form-grupo label,
+body.high-contrast .ubicacion-header span,
+body.high-contrast .estado-pendiente-box p,
+body.high-contrast .sumate-login-link,
+body.high-contrast .sumate-login-link a {
+  color: #ffff00 !important;
+}
+
+body.high-contrast .form-grupo input {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-geo,
+body.high-contrast .btn-submit-sumate,
+body.high-contrast .btn-sumate-primario,
+body.high-contrast .btn-sumate-secundario {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-geo:hover,
+body.high-contrast .btn-submit-sumate:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}

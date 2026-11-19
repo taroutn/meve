@@ -9,6 +9,7 @@ import PanelSuperAdmin from './pages/PanelSuperAdmin';
 import Login from './pages/Login';
 import Navbar from './components/navbar';
 import CarritoDrawer from './components/CarritoDrawer';
+import SumateMeve from './pages/SumateMeve';
 
 export default function App() {
   // Estado que controla si el carrito está visible o no
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/vendedor/panel" element={<PanelVendedor />} />
           <Route path="/admin/moderacion" element={<PanelSuperAdmin />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/sumate" element={<SumateMeve />} />
         </Routes>
       </BrowserRouter>
     </CarritoProvider>
