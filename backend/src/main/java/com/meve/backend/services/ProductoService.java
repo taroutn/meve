@@ -37,6 +37,10 @@ public class ProductoService {
         producto.setStock(request.getStock());
         producto.setActivo(true);
         
+        if (request.getImagenUrl() != null && !request.getImagenUrl().isBlank()) {
+            producto.setImagenUrl(request.getImagenUrl().trim());
+        }
+        
         return productoRepository.save(producto);
     }
 
@@ -120,7 +124,8 @@ public class ProductoService {
                     p.getPrecio(),
                     p.getComercioId(),
                     comercio.getNombre(),
-                    p.getCategoria()
+                    p.getCategoria(),
+                    p.getImagenUrl()
                 ));
             }
         }

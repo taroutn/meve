@@ -96,6 +96,11 @@ public class ComercioService {
         // GeoJSON guarda primero la LONGITUD y después la latitud
         comercio.setUbicacion(new GeoJsonPoint(request.getLng(), request.getLat()));
 
+        if (request.getImagenUrl() != null) {
+            String url = request.getImagenUrl().trim();
+            comercio.setImagenUrl(url.isEmpty() ? null : url);
+        }
+
         return comercioRepository.save(comercio);
     }
 

@@ -30,4 +30,6 @@ public class ComercioUpdateRequest {
     @DecimalMin(value = "-180", message = "Longitud inválida")
     @DecimalMax(value = "180", message = "Longitud inválida")
     private Double lng;
+
+    private String imagenUrl;
 }

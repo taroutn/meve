@@ -6,6 +6,7 @@ public record ProductoCatalogoDTO(
         Double precio,
         String comercioId,
         String comercioNombre,
-        String categoria
+        String categoria,
+        String imagenUrl
 ) {
 }
