@@ -94,7 +94,27 @@ Para garantizar la viabilidad temporal del Trabajo Final, quedan excluidos los s
 - Revisar la consola para constatar la ausencia de advertencias de tipado. Opcionalmente, correr `npm run lint`.
 
 ### 📮 Pruebas de API (Postman)
-En la carpeta `docs/api/` del repositorio se encuentra el archivo `meve.postman_collection.json`. Contiene todos los endpoints de la plataforma preconfigurados. Podés importarlo en Postman para probar el flujo completo (Autenticación, ABM de Catálogo, Creación de Pedidos y Simulación de Webhooks) contra el entorno local o el desplegado.
+En `docs/api/` están las colecciones y los environments para importar en Postman (*Import* y arrastrar los archivos):
+
+| Archivo | Qué es |
+|---|---|
+| `meve.postman_collection.json` | **MeVe MVP**: todos los endpoints de la API, agrupados por quién los usa (Auth, Vitrina pública, Compra Click & Collect, Vendedor y SuperAdmin). |
+| `meve-e2e.postman_collection.json` | **MeVe E2E**: 60 pruebas de punta a punta (login y roles, pedido con descuento de stock y cupo, pago, retiro, cancelación con devolución de stock y cupo, moderación de comercios, catálogo y acceso cruzado entre comercios). |
+| `meve.postman_environment.json` | Environment **MeVe - Local** (`http://localhost:8080`). |
+| `meve-produccion.postman_environment.json` | Environment **MeVe - Producción** (`https://meve.onrender.com`). |
+| `resultados-tarea-35.postman_test_run.json` | Resultado de la corrida de la E2E de la tarea 35. |
+
+Para correr la E2E:
+1. Elegir el environment (Local o Producción) y cargar `password_prueba` en *Current value*: es la clave de los usuarios `@meve.test` (la de `MEVE_SEED_PASSWORD`). No se sube al repositorio.
+2. En Producción, mandar antes cualquier GET (por ejemplo "Listar comercios") para despertar Render: la primera respuesta puede tardar alrededor de un minuto y medio.
+3. *Run* sobre la colección, en orden.
+
+También se puede correr desde la terminal con Newman:
+```bash
+npx newman run docs/api/meve-e2e.postman_collection.json -e docs/api/meve-produccion.postman_environment.json --env-var "password_prueba=<clave>"
+```
+
+> **Ojo:** local y producción usan la misma base de MongoDB Atlas. Cada corrida de la E2E deja datos: un pedido RETIRADO (consume 1 unidad de stock y 1 cupo de Burger Palpalá), un "Comercio de prueba moderacion" que termina SUSPENDIDO y un "Producto de prueba E2E" dado de baja. La parte de cancelación no deja cambios, porque devuelve lo que reserva.
 
 ---
 
@@ -127,6 +147,7 @@ El cliente web se despliega importando el repositorio directamente en Vercel, ut
 
 - **Root Directory:** `frontend`
 - **Build Command:** `npm run build`
+- **Rama de producción:** `main`. La URL pública muestra lo último que se mergea a `main`; las otras ramas generan solo *previews*.
 - **Variables de entorno:**
   - `VITE_API_URL`: Configurada con la URL pública del backend en Render (ej. `https://meve.onrender.com`). Garantiza que todas las peticiones apunten al entorno productivo.
 - **Enrutamiento y SPA:** Se incorporó el archivo `vercel.json` en la raíz del directorio frontend configurando los *rewrites* `("source": "/(.*)", "destination": "/index.html")`. Esto previene el error 404 de Vercel al recargar páginas en rutas manejadas por React Router.
