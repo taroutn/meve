@@ -1,5 +1,9 @@
 package com.meve.backend.services;
 
+import com.meve.backend.adapters.MercadoPagoSandboxAdapter;
+import com.meve.backend.adapters.WhatsAppTicketGenerator;
+import com.meve.backend.ports.GeneradorDeTicket;
+import com.meve.backend.ports.PasarelaDePago;
 import com.meve.backend.dtos.ItemPedidoRequest;
 import com.meve.backend.dtos.PedidoRequest;
 import com.meve.backend.models.*;
@@ -12,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -40,6 +45,8 @@ class PedidoServiceTest {
     @Mock private ComercioRepository comercioRepository;
     @Mock private ProductoRepository productoRepository;
     @Mock private MongoTemplate mongoTemplate;
+    @Spy private GeneradorDeTicket generadorDeTicket = new WhatsAppTicketGenerator();
+    @Spy private PasarelaDePago pasarelaDePago = new MercadoPagoSandboxAdapter();
 
     @InjectMocks private PedidoService pedidoService;
 
