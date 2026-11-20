@@ -152,6 +152,24 @@ class PedidoServiceTest {
         verifyNoInteractions(mongoTemplate);
     }
 
+    // ---------- Retiro y trazabilidad (RF-30, RNF-11) ----------
+
+    @Test
+    void retirarUnPedidoPagadoPasaARetiradoYGuardaLaFecha() {
+        Pedido pagado = pedido("ped1", "c1", EstadoPedido.PAGADO_CONFIRMADO);
+        Pedido retirado = pedido("ped1", "c1", EstadoPedido.RETIRADO);
+        when(pedidoRepository.findById("ped1")).thenReturn(Optional.of(pagado));
+        when(mongoTemplate.findAndModify(any(Query.class), any(Update.class),
+                any(FindAndModifyOptions.class), eq(Pedido.class))).thenReturn(retirado);
+
+        Pedido resultado = pedidoService.retirar("ped1", "meve-abc123", "c1");
+
+        assertSame(retirado, resultado);
+        Document set = setDelUpdate();
+        assertEquals(EstadoPedido.RETIRADO, set.get("estado"));
+        assertNotNull(set.get("retiradoEn"), "Tiene que registrar el momento del retiro (RNF-11)");
+    }
+
     // ---------- Cancelación (RF-23) ----------
 
     @Test
