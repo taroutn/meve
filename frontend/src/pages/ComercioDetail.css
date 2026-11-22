@@ -85,3 +85,27 @@
   gap: 2rem;
   padding-top: 1.5rem;
 }
+
+/* ==========================================
+   MODO OSCURO Y ALTO CONTRASTE - ESTADO VACÍO
+   ========================================== */
+
+body.dark-mode .no-products-fallback {
+  background-color: #1e1e1e !important;
+  border: 1px solid #333 !important;
+  color: #b0b0b0 !important;
+}
+
+body.dark-mode .no-products-fallback p {
+  color: #b0b0b0 !important;
+}
+
+body.high-contrast .no-products-fallback {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+body.high-contrast .no-products-fallback p {
+  color: #ffff00 !important;
+}
