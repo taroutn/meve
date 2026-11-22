@@ -1,4 +1,5 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
+import { subirImagenCloudinary } from '../utils/cloudinary';
 import './ConfiguracionComercio.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -21,6 +22,7 @@ export default function ConfiguracionComercio({
   const [nombreComercio, setNombreComercio] = useState('');
   const [estadoActual, setEstadoActual] = useState<string>('');
   const [horarios, setHorarios] = useState('');
+  const [imagenUrl, setImagenUrl] = useState('');
   const [lat, setLat] = useState('');
   const [lng, setLng] = useState('');
 
@@ -36,6 +38,7 @@ export default function ConfiguracionComercio({
   // Estados de UI
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
   const [geoLoading, setGeoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [exito, setExito] = useState<string | null>(null);
@@ -58,8 +61,8 @@ export default function ConfiguracionComercio({
           setNombreComercio(data.nombre || '');
           setEstadoActual(data.estado || '');
           setHorarios(data.horarios || '');
+          setImagenUrl(data.imagenUrl || '');
 
-          // GeoJSON en MongoDB guarda [longitud, latitud]
           if (data.ubicacion) {
             let latParsed: number | null = null;
             let lngParsed: number | null = null;
@@ -96,7 +99,7 @@ export default function ConfiguracionComercio({
           }
         }
       } catch {
-        // Si el comercio está en PENDIENTE y el GET público lo oculta, permite cargar manual
+        // Permite cargar manual si el GET público oculta comercios en PENDIENTE
       } finally {
         setCargando(false);
       }
@@ -104,6 +107,23 @@ export default function ConfiguracionComercio({
 
     cargarDatosComercio();
   }, [comercioId]);
+
+  const handleSeleccionarImagen = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setError(null);
+    setSubiendoImagen(true);
+    try {
+      const urlSubida = await subirImagenCloudinary(file);
+      setImagenUrl(urlSubida);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo subir la imagen del comercio.');
+    } finally {
+      setSubiendoImagen(false);
+      e.target.value = '';
+    }
+  };
 
   const ubicacionModificada =
     latOriginal !== null &&
@@ -201,6 +221,7 @@ export default function ConfiguracionComercio({
         horarios: horarios.trim(),
         lat: latNum,
         lng: lngNum,
+        imagenUrl: imagenUrl.trim(), // "" limpia la foto si el usuario la quitó
         franjas: franjas.map((f) => ({
           rango: f.rango.trim(),
           capacidadMaxima: Number(f.capacidadMaxima),
@@ -228,7 +249,6 @@ export default function ConfiguracionComercio({
         throw new Error(data.message || 'No se pudo actualizar la configuración del comercio.');
       }
 
-      // Actualizamos referencias locales con la respuesta del servidor
       setLatOriginal(latNum);
       setLngOriginal(lngNum);
       if (data.estado) {
@@ -251,7 +271,7 @@ export default function ConfiguracionComercio({
           'Configuración guardada. Como modificaste las coordenadas, tu comercio pasó a estado PENDIENTE hasta ser aprobado nuevamente por el SuperAdmin.'
         );
       } else {
-        setExito('Configuración de comercio y franjas horarias actualizada correctamente.');
+        setExito('Configuración de comercio, imagen y franjas horarias actualizada correctamente.');
       }
     } catch (err: any) {
       setError(err.message || 'Error al guardar los cambios.');
@@ -269,7 +289,7 @@ export default function ConfiguracionComercio({
       <header className="config-comercio-header">
         <div>
           <h3>Configurar mi Comercio y Franjas {nombreComercio ? `— ${nombreComercio}` : ''}</h3>
-          <p>Administrá tus horarios de atención, ubicación del local y cupos por franja de retiro.</p>
+          <p>Administrá la foto del local, horarios de atención, ubicación y cupos por franja de retiro.</p>
         </div>
         {estadoActual && (
           <span className={`badge-estado-comercio estado-${estadoActual.toLowerCase()}`}>
@@ -282,9 +302,38 @@ export default function ConfiguracionComercio({
       {exito && <div className="config-alerta exito">✅ {exito}</div>}
 
       <form onSubmit={handleSubmit} className="config-comercio-form" noValidate>
-        {/* Bloque 1: Horarios y Ubicación */}
+        {/* Bloque 1: Imagen, Horarios y Ubicación */}
         <div className="config-seccion">
-          <h4>1. Horarios y Ubicación Geográfica</h4>
+          <h4>1. Identidad Visual, Horarios y Ubicación</h4>
+
+          <div className="config-grupo">
+            <label htmlFor="config-imagen">Foto de Portada del Comercio (opcional)</label>
+            <div className="imagen-upload-box">
+              <input
+                id="config-imagen"
+                type="file"
+                accept="image/*"
+                onChange={handleSeleccionarImagen}
+                disabled={subiendoImagen}
+              />
+              {subiendoImagen && (
+                <span className="upload-status">⏳ Subiendo imagen a Cloudinary...</span>
+              )}
+            </div>
+
+            {imagenUrl && (
+              <div className="imagen-preview-wrapper">
+                <img src={imagenUrl} alt="Vista previa del comercio" className="imagen-preview-thumb" />
+                <button
+                  type="button"
+                  className="btn-quitar-imagen"
+                  onClick={() => setImagenUrl('')}
+                >
+                  Quitar imagen
+                </button>
+              </div>
+            )}
+          </div>
 
           <div className="config-grupo">
             <label htmlFor="config-horarios">Horarios de Atención *</label>
@@ -429,7 +478,11 @@ export default function ConfiguracionComercio({
         </div>
 
         <div className="config-acciones">
-          <button type="submit" className="btn-guardar-config" disabled={guardando}>
+          <button
+            type="submit"
+            className="btn-guardar-config"
+            disabled={guardando || subiendoImagen}
+          >
             {guardando ? 'Guardando cambios...' : 'Guardar Configuración'}
           </button>
         </div>
