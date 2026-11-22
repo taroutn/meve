@@ -109,3 +109,136 @@
   border-radius: 6px;
   font-family: monospace;
 }
+
+/* ==========================================
+   CONTROLES DE FILTRO (DISPONIBILIDAD / LIMPIAR / GEO)
+   ========================================== */
+
+.comercio-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.filtro-disponibles-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e35;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Anula el width/min-width/padding que hereda de .filtros-container input */
+.filtros-container input[type="checkbox"],
+.filtro-checkbox {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  flex: 0 0 18px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  accent-color: #5a7d65;
+  cursor: pointer;
+}
+
+.btn-limpiar-filtros {
+  flex: 0 0 auto;
+  background-color: transparent;
+  border: 1px solid #5a7d65;
+  color: #5a7d65;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-limpiar-filtros:hover {
+  background-color: #5a7d65;
+  color: #ffffff;
+}
+
+.geo-aviso-banner {
+  background-color: #fff8e1;
+  color: #6d4c41;
+  border: 1px solid #ffe082;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* ==========================================
+   MODO OSCURO
+   ========================================== */
+
+body.dark-mode .filtro-disponibles-label {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .filtro-checkbox {
+  accent-color: #8fb99a;
+}
+
+body.dark-mode .btn-limpiar-filtros {
+  border-color: #8fb99a !important;
+  color: #8fb99a !important;
+  background-color: transparent !important;
+}
+
+body.dark-mode .btn-limpiar-filtros:hover {
+  background-color: #8fb99a !important;
+  color: #121212 !important;
+}
+
+body.dark-mode .geo-aviso-banner {
+  background-color: #2c2516 !important;
+  color: #f5e6c4 !important;
+  border-color: #665222 !important;
+}
+
+/* ==========================================
+   ALTO CONTRASTE
+   ========================================== */
+
+body.high-contrast .filtro-disponibles-label {
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+  background-color: #000000 !important;
+}
+
+body.high-contrast .filtro-checkbox {
+  accent-color: #ffff00 !important;
+  outline: 1px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-limpiar-filtros {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .btn-limpiar-filtros:hover {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .geo-aviso-banner {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}

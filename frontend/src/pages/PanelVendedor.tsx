@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { PedidoResponse as PedidoBase } from '../types/pedido';
 import type { Product as ProductBase } from '../types/product';
+import ConfiguracionComercio from '../components/ConfiguracionComercio';
 import './PanelVendedor.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -19,7 +20,7 @@ interface Product extends ProductBase {
 }
 
 export default function PanelVendedor() {
-  const [tabActiva, setTabActiva] = useState<'pedidos' | 'stock'>('pedidos');
+  const [tabActiva, setTabActiva] = useState<'pedidos' | 'stock' | 'configuracion'>('pedidos');
   const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
   const [productos, setProductos] = useState<Product[]>([]);
   const [busquedaTicket, setBusquedaTicket] = useState('');
@@ -29,7 +30,10 @@ export default function PanelVendedor() {
   const comercioIdActual = localStorage.getItem('comercioId') || 'comercio-1'; 
 
   useEffect(() => {
-    cargarDatosVendedor();
+    setError(null);
+    if (tabActiva === 'pedidos' || tabActiva === 'stock') {
+      cargarDatosVendedor();
+    }
   }, [tabActiva]);
 
   const cargarDatosVendedor = async () => {
@@ -44,7 +48,7 @@ export default function PanelVendedor() {
         if (!res.ok) throw new Error('Error al cargar los pedidos de la jornada.');
         const data = await res.json();
         setPedidos(data);
-      } else {
+      } else if (tabActiva === 'stock') {
         const res = await fetch(`${API_URL}/api/comercios/${comercioIdActual}/productos`, { headers });
         if (!res.ok) throw new Error('Error al cargar el catálogo de productos.');
         const data = await res.json();
@@ -153,6 +157,12 @@ export default function PanelVendedor() {
         >
           Gestión de Stock y Catálogo
         </button>
+        <button 
+          className={`tab-btn ${tabActiva === 'configuracion' ? 'active' : ''}`}
+          onClick={() => setTabActiva('configuracion')}
+        >
+          Configurar mi Comercio y Franjas
+        </button>
       </div>
 
       {error && <div className="status-message error">⚠️ {error}</div>}
@@ -253,6 +263,10 @@ export default function PanelVendedor() {
             </div>
           )}
         </div>
+      )}
+
+      {tabActiva === 'configuracion' && (
+        <ConfiguracionComercio comercioId={comercioIdActual} />
       )}
     </div>
   );
