@@ -1,0 +1,419 @@
+.config-comercio-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  margin-top: 1.5rem;
+}
+
+.config-comercio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-comercio-header h3 {
+  color: #5a7d65;
+  margin: 0 0 0.35rem 0;
+  font-size: 1.35rem;
+}
+
+.config-comercio-header p {
+  margin: 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.badge-estado-comercio {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.estado-activo {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-pendiente {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.estado-suspendido {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.config-alerta {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.config-alerta.error {
+  background-color: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6cb;
+}
+
+.config-alerta.exito {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+}
+
+.config-alerta.advertencia {
+  background-color: #fff8e1;
+  color: #6d4c41;
+  border: 1px solid #ffe082;
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.config-comercio-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.config-seccion {
+  border: 1px solid #e2ebe4;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.config-seccion h4 {
+  margin: 0;
+  color: #5a7d65;
+  font-size: 1.05rem;
+}
+
+.config-ayuda {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.config-fila-dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .config-fila-dos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.config-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.config-grupo label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.config-grupo input {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cbd5ce;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.config-grupo input:focus {
+  outline: none;
+  border-color: #5a7d65;
+}
+
+.config-ubicacion-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.config-ubicacion-bar span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-geo-config {
+  background-color: #eef4f0;
+  color: #5a7d65;
+  border: 1px solid #5a7d65;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.btn-geo-config:hover:not(:disabled) {
+  background-color: #5a7d65;
+  color: #ffffff;
+}
+
+/* === FRANJAS HORARIAS === */
+.agregar-franja-box {
+  display: grid;
+  grid-template-columns: 2fr 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  background-color: #f8faf9;
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: 1px dashed #c5d8cb;
+}
+
+@media (max-width: 650px) {
+  .agregar-franja-box {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-agregar-franja {
+  background-color: #5a7d65;
+  color: #ffffff;
+  border: none;
+  padding: 0.62rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.btn-agregar-franja:hover {
+  background-color: #496753;
+}
+
+.franjas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.franja-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.franja-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.franja-reservas-tag {
+  font-size: 0.82rem;
+  color: #5a7d65;
+  font-weight: 600;
+}
+
+.franja-controles {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.franja-controles label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.franja-controles input {
+  width: 72px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #cbd5ce;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.btn-eliminar-franja {
+  background: transparent;
+  border: 1px solid #e57373;
+  border-radius: 6px;
+  padding: 0.35rem 0.55rem;
+  cursor: pointer;
+}
+
+.btn-eliminar-franja:hover {
+  background-color: #ffebee;
+}
+
+.franjas-vacio {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.config-acciones {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-guardar-config {
+  background-color: #5a7d65;
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-guardar-config:hover:not(:disabled) {
+  background-color: #496753;
+}
+
+.btn-guardar-config:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* === MODO OSCURO === */
+body.dark-mode .config-comercio-card,
+body.dark-mode .franja-item {
+  background-color: #1e1e1e;
+  border-color: #333;
+}
+
+body.dark-mode .agregar-franja-box {
+  background-color: #252525;
+  border-color: #444;
+}
+
+body.dark-mode .config-comercio-header h3,
+body.dark-mode .config-seccion h4 {
+  color: #8fb99a;
+}
+
+body.dark-mode .config-comercio-header p,
+body.dark-mode .config-ayuda,
+body.dark-mode .config-grupo label,
+body.dark-mode .config-ubicacion-bar span,
+body.dark-mode .franja-info strong,
+body.dark-mode .franja-controles label {
+  color: #e0e0e0;
+}
+
+body.dark-mode .config-seccion {
+  border-color: #383838;
+}
+
+body.dark-mode .config-grupo input,
+body.dark-mode .franja-controles input {
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
+}
+
+/* === ALTO CONTRASTE === */
+body.high-contrast .config-comercio-card,
+body.high-contrast .config-seccion,
+body.high-contrast .agregar-franja-box,
+body.high-contrast .franja-item {
+  background-color: #000000 !important;
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+body.high-contrast .config-comercio-header h3,
+body.high-contrast .config-comercio-header p,
+body.high-contrast .config-seccion h4,
+body.high-contrast .config-ayuda,
+body.high-contrast .config-grupo label,
+body.high-contrast .config-ubicacion-bar span,
+body.high-contrast .franja-info strong,
+body.high-contrast .franja-reservas-tag,
+body.high-contrast .franja-controles label {
+  color: #ffff00 !important;
+}
+
+body.high-contrast .config-grupo input,
+body.high-contrast .franja-controles input,
+body.high-contrast .btn-geo-config,
+body.high-contrast .btn-agregar-franja,
+body.high-contrast .btn-guardar-config {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+.imagen-upload-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.upload-status {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5a7d65;
+}
+
+.imagen-preview-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.imagen-preview-thumb {
+  width: 110px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #cbd5ce;
+}
+
+.btn-quitar-imagen {
+  background: transparent;
+  border: 1px solid #d32f2f;
+  color: #d32f2f;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+body.dark-mode .upload-status {
+  color: #8fb99a;
+}
+
+body.high-contrast .imagen-preview-thumb,
+body.high-contrast .btn-quitar-imagen {
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+  background-color: #000000 !important;
+}

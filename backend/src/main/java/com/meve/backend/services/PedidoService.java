@@ -3,6 +3,8 @@ package com.meve.backend.services;
 import com.meve.backend.dtos.ItemPedidoRequest;
 import com.meve.backend.dtos.PedidoRequest;
 import com.meve.backend.models.*;
+import com.meve.backend.ports.GeneradorDeTicket;
+import com.meve.backend.ports.PasarelaDePago;
 import com.meve.backend.repositories.ComercioRepository;
 import com.meve.backend.repositories.PedidoRepository;
 import com.meve.backend.repositories.ProductoRepository;
@@ -17,14 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class PedidoService {
@@ -40,6 +39,12 @@ public class PedidoService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private PasarelaDePago pasarelaDePago;
+
+    @Autowired
+    private GeneradorDeTicket generadorDeTicket;
 
     public Pedido registrarPedido(PedidoRequest request) {
         Comercio comercio = comercioRepository.findById(request.getComercioId())
@@ -107,7 +112,7 @@ public class PedidoService {
         franjaSeleccionada.setCuposDisponibles(franjaSeleccionada.getCuposDisponibles() - 1);
         comercioRepository.save(comercio);
 
-        String codigoTicket = "MEVE-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        String codigoTicket = generadorDeTicket.generarCodigoTicket();
 
         Pedido pedido = new Pedido();
         pedido.setCodigoTicket(codigoTicket);
@@ -122,13 +127,11 @@ public class PedidoService {
         pedido.setCreatedAt(LocalDateTime.now());
         pedido.setUpdatedAt(LocalDateTime.now());
 
-        pedido.setWhatsappUrl(generarWhatsappUrl(comercio, pedido));
+        pedido.setWhatsappUrl(generadorDeTicket.generarWhatsappUrl(comercio, pedido));
 
-        String prefId = "PREF-SBX-" + pedido.getCodigoTicket();
-        pedido.setPreferenceId(prefId);
-        pedido.setSandboxInitPoint(
-            "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=" + prefId
-        );
+        PasarelaDePago.PreferenciaPago preferencia = pasarelaDePago.crearPreferencia(pedido);
+        pedido.setPreferenceId(preferencia.preferenceId());
+        pedido.setSandboxInitPoint(preferencia.sandboxInitPoint());
 
         return pedidoRepository.save(pedido);
     }
@@ -241,29 +244,6 @@ public class PedidoService {
         };
     }
 
-    private String generarWhatsappUrl(Comercio comercio, Pedido pedido) {
-        String telefono = (comercio.getWhatsapp() != null && !comercio.getWhatsapp().isBlank())
-                ? comercio.getWhatsapp().replaceAll("[^0-9]", "")
-                : "5493884000000";
-
-        StringBuilder mensaje = new StringBuilder();
-        mensaje.append("Hola *").append(comercio.getNombre()).append("*! Realicé un pedido en *MeVe*.\n\n");
-        mensaje.append("🎟️ *Ticket de Retiro:* ").append(pedido.getCodigoTicket()).append("\n");
-        mensaje.append("👤 *Cliente:* ").append(pedido.getCompradorNombre()).append("\n");
-        mensaje.append("⏰ *Franja de Retiro:* ").append(pedido.getFranjaHoraria()).append("\n\n");
-        mensaje.append("📦 *Detalle del pedido:*\n");
-
-        for (ItemPedido item : pedido.getItems()) {
-            mensaje.append("- ").append(item.getCantidad()).append("x ")
-                    .append(item.getNombre()).append(" ($").append(item.getSubtotal()).append(")\n");
-        }
-
-        mensaje.append("\n💰 *Total:* $").append(pedido.getTotal());
-
-        String textoCodificado = URLEncoder.encode(mensaje.toString(), StandardCharsets.UTF_8);
-        return "https://wa.me/" + telefono + "?text=" + textoCodificado;
-    }
-
     public Pedido confirmarPagoIdempotente(String pedidoIdOCodigo, String paymentId) {
         Pedido pedidoActual = pedidoRepository.findById(pedidoIdOCodigo)
                 .or(() -> pedidoRepository.findByCodigoTicket(pedidoIdOCodigo))
@@ -275,7 +255,7 @@ public class PedidoService {
 
         Pedido actualizado = cambiarEstado(pedidoActual, EstadoPedido.PENDIENTE_PAGO, EstadoPedido.PAGADO_CONFIRMADO);
 
-        actualizado.setPaymentId(paymentId != null && !paymentId.isBlank() ? paymentId : "MP-SANDBOX-SIM");
+        actualizado.setPaymentId(pasarelaDePago.resolverPaymentId(paymentId));
         return pedidoRepository.save(actualizado);
     }
 }

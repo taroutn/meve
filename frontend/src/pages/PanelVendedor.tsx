@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import type { PedidoResponse as PedidoBase } from '../types/pedido';
 import type { Product as ProductBase } from '../types/product';
+import ConfiguracionComercio from '../components/ConfiguracionComercio';
+import { subirImagenCloudinary } from '../utils/cloudinary';
+import { obtenerFallbackProducto } from '../utils/fallbackImages';
 import './PanelVendedor.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -19,17 +22,31 @@ interface Product extends ProductBase {
 }
 
 export default function PanelVendedor() {
-  const [tabActiva, setTabActiva] = useState<'pedidos' | 'stock'>('pedidos');
+  const [tabActiva, setTabActiva] = useState<'pedidos' | 'stock' | 'configuracion'>('pedidos');
   const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
   const [productos, setProductos] = useState<Product[]>([]);
   const [busquedaTicket, setBusquedaTicket] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Estados para alta de nuevo producto (RF + Cloudinary #45)
+  const [nuevoNombre, setNuevoNombre] = useState('');
+  const [nuevoPrecio, setNuevoPrecio] = useState('');
+  const [nuevaCategoria, setNuevaCategoria] = useState('General');
+  const [nuevaDescripcion, setNuevaDescripcion] = useState('');
+  const [nuevoStock, setNuevoStock] = useState('10');
+  const [nuevaImagenUrl, setNuevaImagenUrl] = useState('');
+  const [subiendoNuevaImg, setSubiendoNuevaImg] = useState(false);
+  const [creandoProducto, setCreandoProducto] = useState(false);
+  const [subiendoIdProducto, setSubiendoIdProducto] = useState<string | null>(null);
+
   const comercioIdActual = localStorage.getItem('comercioId') || 'comercio-1'; 
 
   useEffect(() => {
-    cargarDatosVendedor();
+    setError(null);
+    if (tabActiva === 'pedidos' || tabActiva === 'stock') {
+      cargarDatosVendedor();
+    }
   }, [tabActiva]);
 
   const cargarDatosVendedor = async () => {
@@ -44,7 +61,7 @@ export default function PanelVendedor() {
         if (!res.ok) throw new Error('Error al cargar los pedidos de la jornada.');
         const data = await res.json();
         setPedidos(data);
-      } else {
+      } else if (tabActiva === 'stock') {
         const res = await fetch(`${API_URL}/api/comercios/${comercioIdActual}/productos`, { headers });
         if (!res.ok) throw new Error('Error al cargar el catálogo de productos.');
         const data = await res.json();
@@ -54,6 +71,75 @@ export default function PanelVendedor() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubirImagenNuevoProducto = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSubiendoNuevaImg(true);
+    setError(null);
+    try {
+      const url = await subirImagenCloudinary(file);
+      setNuevaImagenUrl(url);
+    } catch (err: any) {
+      setError(err.message || 'No se pudo subir la imagen del producto.');
+    } finally {
+      setSubiendoNuevaImg(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleCrearProducto = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!nuevoNombre.trim() || !nuevoPrecio || Number(nuevoPrecio) <= 0) {
+      setError('Completá el nombre y un precio mayor a 0 para el producto.');
+      return;
+    }
+
+    setCreandoProducto(true);
+    try {
+      const token = localStorage.getItem('token');
+      const payload = {
+        nombre: nuevoNombre.trim(),
+        precio: Number(nuevoPrecio),
+        categoria: nuevaCategoria.trim() || 'General',
+        descripcion: nuevaDescripcion.trim(),
+        stock: Number(nuevoStock) || 0,
+        imagenUrl: nuevaImagenUrl.trim() || undefined,
+      };
+
+      const res = await fetch(`${API_URL}/api/productos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.message || 'No se pudo crear el producto.');
+      }
+
+      const creado: Product = await res.json();
+      setProductos((prev) => [creado, ...prev]);
+
+      // Reset del formulario
+      setNuevoNombre('');
+      setNuevoPrecio('');
+      setNuevaCategoria('General');
+      setNuevaDescripcion('');
+      setNuevoStock('10');
+      setNuevaImagenUrl('');
+    } catch (err: any) {
+      setError(err.message || 'Error al crear el producto.');
+    } finally {
+      setCreandoProducto(false);
     }
   };
 
@@ -80,7 +166,7 @@ export default function PanelVendedor() {
         let errData;
         try {
           errData = JSON.parse(errorText);
-        } catch (e) {
+        } catch {
           errData = { message: errorText };
         }
         throw new Error(errData.message || 'No se pudo actualizar el estado del pedido.');
@@ -92,11 +178,21 @@ export default function PanelVendedor() {
     }
   };
 
-  const actualizarStockYEstado = async (productoId: string, nuevoStock: number, activo: boolean) => {
+  const actualizarProducto = async (
+    productoId: string,
+    nuevoStock: number,
+    activo: boolean,
+    imagenUrlActualizada?: string
+  ) => {
     try {
       const token = localStorage.getItem('token');
       const productoActual = productos.find(p => p.id === productoId);
       if (!productoActual) return;
+
+      const imagenFinal =
+        imagenUrlActualizada !== undefined
+          ? imagenUrlActualizada
+          : (productoActual.imagenUrl ?? null);
 
       const payload = {
         nombre: productoActual.nombre || 'Producto MeVe',
@@ -105,7 +201,8 @@ export default function PanelVendedor() {
         descripcion: productoActual.descripcion || '',
         stock: nuevoStock,
         activo: activo,
-        comercioId: comercioIdActual
+        comercioId: comercioIdActual,
+        imagenUrl: imagenFinal,
       };
 
       const res = await fetch(`${API_URL}/api/productos/${productoId}`, {
@@ -122,9 +219,34 @@ export default function PanelVendedor() {
         throw new Error(errorText || 'Error al actualizar el producto.');
       }
       
-      setProductos(prev => prev.map(p => p.id === productoId ? { ...p, stock: nuevoStock, activo } : p));
+      setProductos(prev =>
+        prev.map(p =>
+          p.id === productoId
+            ? { ...p, stock: nuevoStock, activo, imagenUrl: imagenFinal || undefined }
+            : p
+        )
+      );
     } catch (err: any) {
       alert(`Error: ${err.message}`);
+    }
+  };
+
+  const handleCambiarFotoProductoExistente = async (
+    producto: Product,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSubiendoIdProducto(producto.id);
+    try {
+      const urlSubida = await subirImagenCloudinary(file);
+      await actualizarProducto(producto.id, producto.stock ?? 0, producto.activo ?? true, urlSubida);
+    } catch (err: any) {
+      alert(`Error al subir imagen: ${err.message}`);
+    } finally {
+      setSubiendoIdProducto(null);
+      e.target.value = '';
     }
   };
 
@@ -152,6 +274,12 @@ export default function PanelVendedor() {
           onClick={() => setTabActiva('stock')}
         >
           Gestión de Stock y Catálogo
+        </button>
+        <button 
+          className={`tab-btn ${tabActiva === 'configuracion' ? 'active' : ''}`}
+          onClick={() => setTabActiva('configuracion')}
+        >
+          Configurar mi Comercio y Franjas
         </button>
       </div>
 
@@ -221,6 +349,77 @@ export default function PanelVendedor() {
 
       {tabActiva === 'stock' && (
         <div className="seccion-stock">
+          {/* Formulario de creación de producto con imagen */}
+          <form onSubmit={handleCrearProducto} className="nuevo-producto-form">
+            <h3>+ Agregar Producto al Catálogo</h3>
+            <div className="nuevo-producto-grid">
+              <input
+                type="text"
+                placeholder="Nombre del producto *"
+                value={nuevoNombre}
+                onChange={(e) => setNuevoNombre(e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Precio ($) *"
+                min="1"
+                step="any"
+                value={nuevoPrecio}
+                onChange={(e) => setNuevoPrecio(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Categoría (Ej: Panadería, Bebidas)"
+                value={nuevaCategoria}
+                onChange={(e) => setNuevaCategoria(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Stock inicial"
+                min="0"
+                value={nuevoStock}
+                onChange={(e) => setNuevoStock(e.target.value)}
+              />
+            </div>
+
+            <div className="nuevo-producto-imagen-row">
+              <label className="label-file-producto">
+                Foto del producto:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSubirImagenNuevoProducto}
+                  disabled={subiendoNuevaImg}
+                />
+              </label>
+
+              {subiendoNuevaImg && <span>⏳ Subiendo a Cloudinary...</span>}
+
+              {nuevaImagenUrl && (
+                <div className="preview-mini-box">
+                  <img src={nuevaImagenUrl} alt="Vista previa" className="preview-mini-img" />
+                  <button
+                    type="button"
+                    className="btn-quitar-mini"
+                    onClick={() => setNuevaImagenUrl('')}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn-crear-producto"
+                disabled={creandoProducto || subiendoNuevaImg}
+              >
+                {creandoProducto ? 'Guardando...' : 'Agregar Producto'}
+              </button>
+            </div>
+          </form>
+
           {loading ? (
             <p>Cargando catálogo...</p>
           ) : productos.length === 0 ? (
@@ -229,21 +428,43 @@ export default function PanelVendedor() {
             <div className="productos-stock-grid">
               {productos.map(prod => (
                 <div key={prod.id} className="product-stock-card">
+                  <img
+                    src={prod.imagenUrl || obtenerFallbackProducto(prod.categoria)}
+                    alt={prod.nombre}
+                    className="stock-card-thumb"
+                    onError={(e) => {
+                      e.currentTarget.src = obtenerFallbackProducto(prod.categoria);
+                    }}
+                  />
                   <h4>{prod.nombre}</h4>
                   <p className="precio-prod">Precio: ${prod.precio}</p>
+
+                  <div className="stock-foto-edit">
+                    <label className="btn-cambiar-foto">
+                      {subiendoIdProducto === prod.id ? '⏳ Subiendo...' : 'Cambiar foto'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        disabled={subiendoIdProducto === prod.id}
+                        onChange={(e) => handleCambiarFotoProductoExistente(prod, e)}
+                      />
+                    </label>
+                  </div>
+
                   <div className="stock-controls">
                     <label>
                       Stock: 
                       <input 
                         type="number" 
                         value={prod.stock ?? 0} 
-                        onChange={(e) => actualizarStockYEstado(prod.id, Number(e.target.value), prod.activo ?? true)}
+                        onChange={(e) => actualizarProducto(prod.id, Number(e.target.value), prod.activo ?? true)}
                         min="0"
                       />
                     </label>
                     <button 
                       className={`btn-toggle-activo ${prod.activo !== false ? 'activo' : 'pausado'}`}
-                      onClick={() => actualizarStockYEstado(prod.id, prod.stock ?? 0, !(prod.activo !== false))}
+                      onClick={() => actualizarProducto(prod.id, prod.stock ?? 0, !(prod.activo !== false))}
                     >
                       {prod.activo !== false ? ' Activo' : ' Pausado'}
                     </button>
@@ -253,6 +474,10 @@ export default function PanelVendedor() {
             </div>
           )}
         </div>
+      )}
+
+      {tabActiva === 'configuracion' && (
+        <ConfiguracionComercio comercioId={comercioIdActual} />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Product } from '../types/product';
 import { useCarrito } from '../hooks/useCarrito';
+import { obtenerFallbackProducto } from '../utils/fallbackImages';
 import './ProductCard.css';
 
 interface ProductCardProps {
@@ -10,11 +11,19 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { items, agregar, sumar, restar, vaciarYAgregar } = useCarrito();
   const [showModal, setShowModal] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [product.imagenUrl]);
 
   const cartItem = items?.find((item) => String(item.id) === String(product.id));
   const cantidad = cartItem ? cartItem.cantidad : 0;
 
-  const fallbackImage = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=500';
+  const imagenMostrar =
+    product.imagenUrl && !imgError
+      ? product.imagenUrl
+      : obtenerFallbackProducto(product.categoria);
 
   const handleAdd = () => {
     const success = agregar(product);
@@ -29,7 +38,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="product-card">
       <div className="product-image-container">
-        <img src={product.imagenUrl || fallbackImage} alt={product.nombre} className="product-image" />
+        <img
+          src={imagenMostrar}
+          alt={product.nombre}
+          className="product-image"
+          onError={() => setImgError(true)}
+        />
       </div>
       <div className="product-info">
         <small className="product-comercio">{product.comercioNombre}</small>

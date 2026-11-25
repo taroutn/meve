@@ -20,6 +20,7 @@ public class Comercio {
     private String descripcion;
     private String whatsapp;
     private String horarios;
+    private String imagenUrl;
 
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     private GeoJsonPoint ubicacion;

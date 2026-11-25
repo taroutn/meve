@@ -9,16 +9,20 @@ import lombok.Data;
 public class Producto {
     @Id
     private String id;
-    
+
     // Este es el vínculo crucial con el Tenant
-    private String comercioId; 
-    
+    private String comercioId;
+
     private String nombre;
     private Double precio;
     private Integer stock;
     private Boolean activo = true;
     private String categoria;
-// Baja lógica (RF-09): el producto deja de existir para la vitrina y el vendedor,
-// pero el documento queda para no romper los pedidos históricos que lo referencian
-private Boolean eliminado = false;
+    private String imagenUrl;
+    
+    // Baja lógica (RF-09): el producto deja de existir para la vitrina y el
+    // vendedor,
+    // pero el documento queda para no romper los pedidos históricos que lo
+    // referencian
+    private Boolean eliminado = false;
 }
