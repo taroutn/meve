@@ -36,6 +36,10 @@ public class ProductoService {
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
         producto.setActivo(true);
+
+        if (request.getDescripcion() != null && !request.getDescripcion().isBlank()) {
+            producto.setDescripcion(request.getDescripcion().trim());
+        }
         
         if (request.getImagenUrl() != null && !request.getImagenUrl().isBlank()) {
             producto.setImagenUrl(request.getImagenUrl().trim());
@@ -109,10 +113,11 @@ public class ProductoService {
                 if (catFiltro != null && (p.getCategoria() == null || !p.getCategoria().toLowerCase().equals(catFiltro))) {
                     continue;
                 }
-                // Búsqueda textual en nombre
+                // Búsqueda textual en nombre y descripción (RF-14)
                 if (textoBusqueda != null) {
                     boolean coincideNombre = p.getNombre() != null && p.getNombre().toLowerCase().contains(textoBusqueda);
-                    if (!coincideNombre) {
+                    boolean coincideDescripcion = p.getDescripcion() != null && p.getDescripcion().toLowerCase().contains(textoBusqueda);
+                    if (!coincideNombre && !coincideDescripcion) {
                         continue;
                     }
                 }
@@ -121,6 +126,7 @@ public class ProductoService {
                 resultado.add(new ProductoCatalogoDTO(
                     p.getId(),
                     p.getNombre(),
+                    p.getDescripcion(),
                     p.getPrecio(),
                     p.getComercioId(),
                     comercio.getNombre(),

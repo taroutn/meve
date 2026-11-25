@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/pedidos", "/api/pedidos/webhook", "/api/pedidos/*/cancelar").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/productos", "/api/comercios/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/productos", "/api/comercios/**", "/api/categorias").permitAll()
 
                 // 4. Cualquier otra cosa: con token válido
                 .anyRequest().authenticated()
