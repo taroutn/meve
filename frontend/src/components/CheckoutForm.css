@@ -132,3 +132,43 @@
 .btn-whatsapp:hover {
   opacity: 0.9;
 }
+
+/* Estados de carga y disponibilidad de franjas (#48) */
+.franjas-loading {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px dashed var(--color-verde-salvia);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  text-align: center;
+}
+
+.franjas-warning {
+  background-color: #fff8e1;
+  color: #6d4c41;
+  border: 1px solid #ffe082;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  margin-top: 0.35rem;
+}
+
+.form-group select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+body.dark-mode .franjas-warning {
+  background-color: #2c2516;
+  color: #f5e6c4;
+  border-color: #665222;
+}
+
+body.high-contrast .franjas-loading,
+body.high-contrast .franjas-warning {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
