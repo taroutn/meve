@@ -32,6 +32,11 @@ public class InventarioService {
         producto.setPrecio(request.getPrecio());
         producto.setStock(request.getStock());
 
+        if (request.getDescripcion() != null) {
+            String desc = request.getDescripcion().trim();
+            producto.setDescripcion(desc.isEmpty() ? null : desc);
+        }
+
         if (request.getImagenUrl() != null) {
             String url = request.getImagenUrl().trim();
             producto.setImagenUrl(url.isEmpty() ? null : url);

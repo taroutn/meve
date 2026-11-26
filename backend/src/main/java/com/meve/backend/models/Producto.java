@@ -18,6 +18,7 @@ public class Producto {
     private Integer stock;
     private Boolean activo = true;
     private String categoria;
+    private String descripcion;
     private String imagenUrl;
     
     // Baja lógica (RF-09): el producto deja de existir para la vitrina y el
