@@ -48,6 +48,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="product-info">
         <small className="product-comercio">{product.comercioNombre}</small>
         <h3 className="product-nombre">{product.nombre}</h3>
+        <p className="product-descripcion" title={product.descripcion || undefined}>
+          {product.descripcion}
+        </p>
         <p className="product-precio">${product.precio}</p>
         
         <div className="product-actions">

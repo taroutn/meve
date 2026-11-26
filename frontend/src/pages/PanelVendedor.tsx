@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent, type ChangeEvent } from 'react';
 import type { PedidoResponse as PedidoBase } from '../types/pedido';
 import type { Product as ProductBase } from '../types/product';
+import type { Categoria } from '../types/categoria';
 import ConfiguracionComercio from '../components/ConfiguracionComercio';
 import { subirImagenCloudinary } from '../utils/cloudinary';
 import { obtenerFallbackProducto } from '../utils/fallbackImages';
@@ -17,8 +18,6 @@ interface PedidoResponse extends PedidoBase {
 interface Product extends ProductBase {
   stock?: number;
   activo?: boolean;
-  categoria?: string;
-  descripcion?: string;
 }
 
 export default function PanelVendedor() {
@@ -32,7 +31,7 @@ export default function PanelVendedor() {
   // Estados para alta de nuevo producto (RF + Cloudinary #45)
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoPrecio, setNuevoPrecio] = useState('');
-  const [nuevaCategoria, setNuevaCategoria] = useState('General');
+  const [nuevaCategoria, setNuevaCategoria] = useState('');
   const [nuevaDescripcion, setNuevaDescripcion] = useState('');
   const [nuevoStock, setNuevoStock] = useState('10');
   const [nuevaImagenUrl, setNuevaImagenUrl] = useState('');
@@ -40,7 +39,23 @@ export default function PanelVendedor() {
   const [creandoProducto, setCreandoProducto] = useState(false);
   const [subiendoIdProducto, setSubiendoIdProducto] = useState<string | null>(null);
 
+  // Edición de categoría y descripción de un producto existente (RF-08)
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [editCategoria, setEditCategoria] = useState('');
+  const [editDescripcion, setEditDescripcion] = useState('');
+  const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+
   const comercioIdActual = localStorage.getItem('comercioId') || 'comercio-1'; 
+
+  // Categorías oficiales para el select del formulario (RF-08)
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/categorias`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Categoria[]) => setCategorias(data))
+      .catch(() => setCategorias([]));
+  }, []);
 
   useEffect(() => {
     setError(null);
@@ -100,13 +115,18 @@ export default function PanelVendedor() {
       return;
     }
 
+    if (!nuevaCategoria) {
+      setError('Elegí una categoría para el producto.');
+      return;
+    }
+
     setCreandoProducto(true);
     try {
       const token = localStorage.getItem('token');
       const payload = {
         nombre: nuevoNombre.trim(),
         precio: Number(nuevoPrecio),
-        categoria: nuevaCategoria.trim() || 'General',
+        categoria: nuevaCategoria,
         descripcion: nuevaDescripcion.trim(),
         stock: Number(nuevoStock) || 0,
         imagenUrl: nuevaImagenUrl.trim() || undefined,
@@ -132,7 +152,7 @@ export default function PanelVendedor() {
       // Reset del formulario
       setNuevoNombre('');
       setNuevoPrecio('');
-      setNuevaCategoria('General');
+      setNuevaCategoria('');
       setNuevaDescripcion('');
       setNuevoStock('10');
       setNuevaImagenUrl('');
@@ -182,12 +202,13 @@ export default function PanelVendedor() {
     productoId: string,
     nuevoStock: number,
     activo: boolean,
-    imagenUrlActualizada?: string
-  ) => {
+    imagenUrlActualizada?: string,
+    datosEditados?: { categoria: string; descripcion: string }
+  ): Promise<boolean> => {
     try {
       const token = localStorage.getItem('token');
       const productoActual = productos.find(p => p.id === productoId);
-      if (!productoActual) return;
+      if (!productoActual) return false;
 
       const imagenFinal =
         imagenUrlActualizada !== undefined
@@ -197,8 +218,8 @@ export default function PanelVendedor() {
       const payload = {
         nombre: productoActual.nombre || 'Producto MeVe',
         precio: productoActual.precio ?? 0,
-        categoria: productoActual.categoria || 'General',
-        descripcion: productoActual.descripcion || '',
+        categoria: datosEditados?.categoria ?? (productoActual.categoria || 'General'),
+        descripcion: datosEditados?.descripcion ?? (productoActual.descripcion || ''),
         stock: nuevoStock,
         activo: activo,
         comercioId: comercioIdActual,
@@ -222,13 +243,41 @@ export default function PanelVendedor() {
       setProductos(prev =>
         prev.map(p =>
           p.id === productoId
-            ? { ...p, stock: nuevoStock, activo, imagenUrl: imagenFinal || undefined }
+            ? {
+                ...p,
+                stock: nuevoStock,
+                activo,
+                imagenUrl: imagenFinal || undefined,
+                ...(datosEditados && {
+                  categoria: datosEditados.categoria,
+                  descripcion: datosEditados.descripcion || undefined,
+                }),
+              }
             : p
         )
       );
+      return true;
     } catch (err: any) {
       alert(`Error: ${err.message}`);
+      return false;
     }
+  };
+
+  const abrirEdicion = (prod: Product) => {
+    setEditandoId(prod.id);
+    setEditCategoria(prod.categoria || '');
+    setEditDescripcion(prod.descripcion || '');
+  };
+
+  const guardarEdicion = async (e: FormEvent, prod: Product) => {
+    e.preventDefault();
+    setGuardandoEdicion(true);
+    const ok = await actualizarProducto(prod.id, prod.stock ?? 0, prod.activo ?? true, undefined, {
+      categoria: editCategoria,
+      descripcion: editDescripcion.trim(),
+    });
+    setGuardandoEdicion(false);
+    if (ok) setEditandoId(null);
   };
 
   const handleCambiarFotoProductoExistente = async (
@@ -369,12 +418,19 @@ export default function PanelVendedor() {
                 onChange={(e) => setNuevoPrecio(e.target.value)}
                 required
               />
-              <input
-                type="text"
-                placeholder="Categoría (Ej: Panadería, Bebidas)"
+              <select
                 value={nuevaCategoria}
                 onChange={(e) => setNuevaCategoria(e.target.value)}
-              />
+                required
+                aria-label="Categoría del producto"
+              >
+                <option value="">Categoría *</option>
+                {categorias.map((cat) => (
+                  <option key={cat.id} value={cat.nombre}>
+                    {cat.nombre}
+                  </option>
+                ))}
+              </select>
               <input
                 type="number"
                 placeholder="Stock inicial"
@@ -383,6 +439,16 @@ export default function PanelVendedor() {
                 onChange={(e) => setNuevoStock(e.target.value)}
               />
             </div>
+
+            <textarea
+              className="nuevo-producto-descripcion"
+              placeholder="Descripción (opcional). Ej: ingredientes, tamaño o presentación"
+              value={nuevaDescripcion}
+              onChange={(e) => setNuevaDescripcion(e.target.value)}
+              rows={2}
+              maxLength={300}
+              aria-label="Descripción del producto"
+            />
 
             <div className="nuevo-producto-imagen-row">
               <label className="label-file-producto">
@@ -438,6 +504,12 @@ export default function PanelVendedor() {
                   />
                   <h4>{prod.nombre}</h4>
                   <p className="precio-prod">Precio: ${prod.precio}</p>
+                  <p className="stock-card-categoria">{prod.categoria || 'Sin categoría'}</p>
+                  {prod.descripcion && (
+                    <p className="stock-card-descripcion" title={prod.descripcion}>
+                      {prod.descripcion}
+                    </p>
+                  )}
 
                   <div className="stock-foto-edit">
                     <label className="btn-cambiar-foto">
@@ -450,7 +522,59 @@ export default function PanelVendedor() {
                         onChange={(e) => handleCambiarFotoProductoExistente(prod, e)}
                       />
                     </label>
+                    {editandoId !== prod.id && (
+                      <button
+                        type="button"
+                        className="btn-cambiar-foto"
+                        onClick={() => abrirEdicion(prod)}
+                      >
+                        Editar categoría y descripción
+                      </button>
+                    )}
                   </div>
+
+                  {editandoId === prod.id && (
+                    <form className="stock-edit-form" onSubmit={(e) => guardarEdicion(e, prod)}>
+                      <select
+                        value={editCategoria}
+                        onChange={(e) => setEditCategoria(e.target.value)}
+                        required
+                        aria-label={`Categoría de ${prod.nombre}`}
+                      >
+                        <option value="">Categoría *</option>
+                        {categorias.map((cat) => (
+                          <option key={cat.id} value={cat.nombre}>
+                            {cat.nombre}
+                          </option>
+                        ))}
+                      </select>
+                      <textarea
+                        placeholder="Descripción (opcional)"
+                        value={editDescripcion}
+                        onChange={(e) => setEditDescripcion(e.target.value)}
+                        rows={2}
+                        maxLength={300}
+                        aria-label={`Descripción de ${prod.nombre}`}
+                      />
+                      <div className="stock-edit-actions">
+                        <button
+                          type="button"
+                          className="btn-cambiar-foto"
+                          onClick={() => setEditandoId(null)}
+                          disabled={guardandoEdicion}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="submit"
+                          className="btn-crear-producto"
+                          disabled={guardandoEdicion}
+                        >
+                          {guardandoEdicion ? 'Guardando...' : 'Guardar'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
 
                   <div className="stock-controls">
                     <label>
