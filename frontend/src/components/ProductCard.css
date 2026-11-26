@@ -47,6 +47,21 @@
   color: #1a1a1a;
 }
 
+/* Descripción (RF-08): siempre ocupa 2 líneas, así las tarjetas quedan alineadas
+   tengan o no descripción, y si es más larga se corta con "..." */
+.product-descripcion {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #666;
+  min-height: 2.8em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
 .product-precio {
   font-size: 1.25rem;
   font-weight: bold;

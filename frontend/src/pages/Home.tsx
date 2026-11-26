@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ProductoCard from '../components/ProductCard';
 import type { Product } from '../types/product';
+import type { Categoria } from '../types/categoria';
 import './Home.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -12,7 +13,7 @@ interface Coordenadas {
 
 export default function Home() {
   const [productos, setProductos] = useState<Product[]>([]);
-  const [categoriasDisponibles, setCategoriasDisponibles] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,6 +28,14 @@ export default function Home() {
   const [ubicacion, setUbicacion] = useState<Coordenadas | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoAviso, setGeoAviso] = useState<string | null>(null);
+
+  // Categorías oficiales (RF-14): se piden una sola vez al backend
+  useEffect(() => {
+    fetch(`${API_URL}/api/categorias`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Categoria[]) => setCategorias(data))
+      .catch(() => setCategorias([]));
+  }, []);
 
   // Debounce de 300ms para no disparar una petición en cada tecla
   useEffect(() => {
@@ -113,14 +122,7 @@ export default function Home() {
 
         const data: Product[] = await response.json();
         setProductos(data);
-
-        // Preservamos las categorías únicas descubiertas para mantener completo el selector
-        const nuevasCats = data
-          .map((p) => p.categoria)
-          .filter((cat): cat is string => Boolean(cat));
-        if (nuevasCats.length > 0) {
-          setCategoriasDisponibles((prev) => Array.from(new Set([...prev, ...nuevasCats])));
-        }
+    
       } catch (err: any) {
         if (err.name === 'AbortError') return;
         setError(err.message || 'Error al cargar los productos.');
@@ -158,10 +160,10 @@ export default function Home() {
       <div className="filtros-container">
         <input
           type="text"
-          placeholder="Buscar productos por nombre..."
+          placeholder="Buscar productos por nombre o descripción..."
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          aria-label="Buscar productos por nombre"
+          aria-label="Buscar productos por nombre o descripción"
         />
 
         <select
@@ -170,10 +172,10 @@ export default function Home() {
           aria-label="Filtrar por categoría"
         >
           <option value="">Todas las categorías</option>
-          {categoriasDisponibles.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
+            {categorias.map((cat) => (
+              <option key={cat.id} value={cat.nombre}>
+                {cat.nombre}
+              </option>
           ))}
         </select>
 

@@ -265,11 +265,21 @@ body.high-contrast .empty-state {
   gap: 0.75rem;
 }
 
-.nuevo-producto-grid input {
+.nuevo-producto-grid input,
+.nuevo-producto-grid select,
+.nuevo-producto-descripcion,
+.stock-edit-form select,
+.stock-edit-form textarea {
   padding: 0.6rem 0.8rem;
   border: 1px solid #cbd5ce;
   border-radius: 8px;
   font-size: 0.95rem;
+}
+
+.nuevo-producto-descripcion,
+.stock-edit-form textarea {
+  font-family: inherit;
+  resize: vertical;
 }
 
 .nuevo-producto-imagen-row {
@@ -338,6 +348,43 @@ body.high-contrast .empty-state {
 
 .stock-foto-edit {
   margin-bottom: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Categoría y descripción en la tarjeta de stock (RF-08) */
+.stock-card-categoria {
+  display: inline-block;
+  margin: 0 0 0.4rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a7d65;
+}
+
+.stock-card-descripcion {
+  margin: 0 0 0.65rem 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--color-text-muted, #666);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.stock-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.stock-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .btn-cambiar-foto {
@@ -361,7 +408,11 @@ body.dark-mode .nuevo-producto-form h3 {
   color: #8fb99a;
 }
 
-body.dark-mode .nuevo-producto-grid input {
+body.dark-mode .nuevo-producto-grid input,
+body.dark-mode .nuevo-producto-grid select,
+body.dark-mode .nuevo-producto-descripcion,
+body.dark-mode .stock-edit-form select,
+body.dark-mode .stock-edit-form textarea {
   background-color: #2a2a2a;
   border-color: #444;
   color: #fff;
@@ -369,6 +420,10 @@ body.dark-mode .nuevo-producto-grid input {
 
 body.high-contrast .nuevo-producto-form,
 body.high-contrast .nuevo-producto-grid input,
+body.high-contrast .nuevo-producto-grid select,
+body.high-contrast .nuevo-producto-descripcion,
+body.high-contrast .stock-edit-form select,
+body.high-contrast .stock-edit-form textarea,
 body.high-contrast .btn-crear-producto,
 body.high-contrast .btn-cambiar-foto {
   background-color: #000 !important;
